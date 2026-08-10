@@ -1,0 +1,16 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_PATH: /app/data/training.db
+    ports:
+      - "3000:3000"
+    volumes:
+      - training_data:/app/data
+
+volumes:
+  training_data:

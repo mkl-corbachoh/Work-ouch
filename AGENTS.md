@@ -11,10 +11,10 @@
 
 ## Current Bootstrap State
 
-- There is currently no Node project, lockfile, Justfile, application code, migration, or executable test command. Do not treat commands described in `001-project-foundation/spec.md` as available until the foundation spec creates them.
-- All five initial specs are currently drafts. Do not create `plan.md`, `tasks.md`, or implementation artifacts unless the user moves the workflow to that stage.
+- The Node.js project, npm lockfile, Justfile, application foundation, migration runner, and executable checks now exist; use the documented `just` recipes.
+- Spec 001 is implemented and verified locally but remains `in_progress` because Docker image and persistence verification is blocked by unavailable daemon access. Its tasks 7-8 remain open; specs 002-005 remain drafts.
 - User endpoints have no owning spec yet. Do not place them into `001-project-foundation` or another spec without resolving the open decision in `docs/architecture.md`.
-- Node version, package manager, lint tool, and initial pagination remain undecided; do not guess them before the relevant plan is approved.
+- Spec 001 fixes Node.js 24 LTS, npm, and Biome. Initial pagination remains undecided and outside spec 001.
 
 ## Domain Invariants
 

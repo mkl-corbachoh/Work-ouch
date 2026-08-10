@@ -5,11 +5,14 @@
 API REST modular para gestionar un catalogo global de ejercicios, planificacion
 versionada, entrenamientos realizados y evolucion corporal. Las prioridades son
 claridad, integridad de datos, simplicidad, mantenibilidad y, por ultimo,
+rendimiento.
 
 ## Decisiones globales
 
 - Backend monolitico con Node.js, TypeScript estricto, Express, SQLite,
   `better-sqlite3`, Zod y Vitest.
+- Node.js 24 LTS con npm y lockfile versionado. Biome se usa para lint y formato;
+  TypeScript realiza el typecheck.
 - SQL explicito, sin ORM. Las rutas HTTP no acceden directamente a SQLite.
 - Modulos organizados por capacidad, sin imponer una cantidad fija de capas o
   archivos.
@@ -109,7 +112,6 @@ errores, sin registrar cuerpos completos por defecto.
 - Los endpoints de usuarios estan requeridos, pero ninguna de las cinco specs
   funcionales los incluye y `001-project-foundation` se limita expresamente a
   infraestructura. Debe decidirse si ampliar `001` o crear una spec de usuarios.
-- Falta fijar version de Node.js, gestor de paquetes y herramienta de lint.
 - Falta decidir si las listas iniciales necesitan paginacion desde la primera
   version o si se incorpora cuando exista volumen real.
 - El esquema adjunto no expresa todas las restricciones compuestas ni las

@@ -1,5 +1,5 @@
 ---
-status: draft
+status: in_progress
 ---
 
 # 001 - Base del proyecto

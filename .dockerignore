@@ -1,0 +1,12 @@
+.git
+.gitignore
+.env
+.opencode
+bin
+coverage
+data
+dist
+node_modules
+specs
+tests
+*.log

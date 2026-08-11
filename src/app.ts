@@ -2,6 +2,7 @@ import express, { type Express } from "express";
 import type { Logger } from "pino";
 import type { SqliteDatabase } from "./db/connection";
 import { createExerciseRouter } from "./modules/exercises/exercise.routes";
+import { createRoutineRouter } from "./modules/routines/routine.routes";
 import { errorHandler, HttpError, notFoundHandler } from "./shared/http-errors";
 import { requestLogger } from "./shared/request-logger";
 
@@ -35,6 +36,7 @@ export function createApp({ database, logger }: AppDependencies): Express {
   });
 
   app.use("/api/v1/exercises", createExerciseRouter(database));
+  app.use("/api/v1/routines", createRoutineRouter(database));
 
   app.use(notFoundHandler);
   app.use(errorHandler(logger));

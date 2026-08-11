@@ -1,8 +1,8 @@
 # work-ouch! Training API
 
 API REST de entrenamiento construida con Node.js 24, TypeScript, Express y
-SQLite. Esta version incluye la infraestructura base, `GET /health` y el
-catalogo global de ejercicios.
+SQLite. Esta version incluye la infraestructura base, `GET /health`, el
+catalogo global de ejercicios y la planificacion de rutinas versionadas.
 
 ## Requisitos
 
@@ -66,11 +66,99 @@ No existe borrado fisico. Un ejercicio se desactiva con
 `PATCH { "isActive": false }` y puede reactivarse enviando `true`; su consulta
 directa y sus referencias historicas se conservan.
 
+## API de rutinas
+
+Las rutinas se exponen bajo `/api/v1/routines`:
+
+| Metodo y ruta | Comportamiento |
+|---|---|
+| `POST /api/v1/routines` | Crea una rutina y su version 1 completa. |
+| `POST /api/v1/routines/:id/versions` | Crea la siguiente version completa y la convierte en actual. |
+| `GET /api/v1/routines?userId=<id>` | Lista las rutinas del usuario con un resumen de su version actual. |
+| `GET /api/v1/routines/:id?userId=<id>` | Devuelve la planificacion actual completa. |
+| `GET /api/v1/routines/:id?userId=<id>&versionNumber=<n>` | Devuelve una version historica completa. |
+
+La primera version se envia anidada en `version`; las siguientes se envian como
+una definicion plana junto con `userId`. Cada definicion contiene al menos un
+ejercicio y cada ejercicio al menos una serie. Por ejemplo:
+
+```json
+{
+  "userId": 1,
+  "name": "Fuerza A",
+  "description": "Sesion principal",
+  "version": {
+    "name": "Inicial",
+    "notes": null,
+    "exercises": [
+      {
+        "exerciseId": 1,
+        "position": 1,
+        "restSeconds": 90,
+        "targetRpe": 7,
+        "notes": null,
+        "sets": [
+          {
+            "setNumber": 1,
+            "setType": "work",
+            "targetWeightKg": 80,
+            "targetRepsMin": 8,
+            "targetRepsMax": 10,
+            "targetSeconds": null,
+            "targetRpe": null,
+            "notes": null
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+Las versiones son inmutables y se construyen, validan y sellan dentro de una
+transaccion. Posiciones y numeros de serie deben ser positivos y unicos en su
+ambito. Una serie requiere un rango completo de repeticiones, una duracion o
+ambos. `effectiveTargetRpe` muestra el RPE de la serie o, si es nulo, el heredado
+del ejercicio planificado.
+
+SQLite mantiene durante la construccion un estado pendiente protegido por una
+FK diferida. El commit solo puede completarse tras sellar y seleccionar la
+version inicial o avanzar exactamente una unidad a la nueva version; tampoco se
+pueden insertar versiones adelantadas. Al sellar se vuelve a verificar que los
+ejercicios referenciados continuen activos.
+
+Solo se pueden incorporar ejercicios activos a una version nueva. Las lecturas
+actuales e historicas no los filtran si se desactivan despues y conservan el
+orden por `position` y `setNumber`. El listado de rutinas no tiene paginacion y
+se ordena por nombre sin distinguir mayusculas, nombre exacto e identificador.
+No existen `PATCH`, `DELETE` ni endpoints directos para versiones, ejercicios
+planificados o series.
+
+### Usuarios provisionales y ownership
+
+La tabla minima `users` existe solo como dependencia referencial. Esta API no
+incluye endpoints, autenticacion, servicio ni seed de usuarios: deben
+aprovisionarse explicitamente antes de crear rutinas. Por ahora `userId` es un
+selector obligatorio que evita mezclar propietarios, pero no demuestra la
+identidad del cliente.
+
+Una instalacion limpia puede aprovisionar un usuario mediante la herramienta de
+administracion de SQLite elegida por el operador, proporcionando `email`,
+`display_name`, `created_at` y `updated_at`; los timestamps deben estar
+normalizados a UTC. La futura spec de usuarios sera responsable de este ciclo
+de vida.
+
 ## Base de datos
 
 La aplicacion activa claves foraneas y WAL en cada conexion. Al arrancar aplica
-una sola vez las migraciones pendientes de `database/migrations/`. Las
-convenciones se detallan en [`database/README.md`](database/README.md).
+una sola vez las migraciones pendientes de `database/migrations/`. El puntero
+obligatorio de cada rutina solo puede referenciar una version propia sellada;
+una guardia diferida y triggers de SQLite protegen completitud, avance unitario,
+seleccion obligatoria e inmutabilidad incluso ante SQL directo. Las tablas de
+rutinas son `STRICT` y rechazan bindings textuales en campos numericos. Las
+columnas enteras expuestas por la API se limitan a `Number.MAX_SAFE_INTEGER`. Las
+convenciones se detallan en
+[`database/README.md`](database/README.md).
 
 ```sh
 just db-migrate

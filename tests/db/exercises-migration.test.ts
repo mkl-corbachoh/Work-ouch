@@ -55,7 +55,11 @@ describe("exercise migration", () => {
   it("applies the real migration once with the expected columns", () => {
     expect(runMigrations(temporary.database, MIGRATIONS_DIRECTORY)).toEqual({
       applied: [],
-      skipped: ["0001_create_exercises.sql"],
+      skipped: [
+        "0001_create_exercises.sql",
+        "0002_create_users.sql",
+        "0003_create_routines.sql",
+      ],
     });
 
     const columns = temporary.database
@@ -85,7 +89,7 @@ describe("exercise migration", () => {
       temporary.database
         .prepare("SELECT COUNT(*) AS count FROM schema_migrations")
         .get(),
-    ).toEqual({ count: 1 });
+    ).toEqual({ count: 3 });
   });
 
   it.each([

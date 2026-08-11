@@ -1,5 +1,5 @@
 ---
-status: approved
+status: completed
 ---
 
 # 004 - Entrenamientos realizados

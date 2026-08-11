@@ -2,7 +2,8 @@
 
 API REST de entrenamiento construida con Node.js 24, TypeScript, Express y
 SQLite. Esta version incluye la infraestructura base, `GET /health`, el
-catalogo global de ejercicios y la planificacion de rutinas versionadas.
+catalogo global de ejercicios, la planificacion de rutinas versionadas y el
+registro de entrenamientos realizados.
 
 ## Requisitos
 
@@ -134,6 +135,32 @@ se ordena por nombre sin distinguir mayusculas, nombre exacto e identificador.
 No existen `PATCH`, `DELETE` ni endpoints directos para versiones, ejercicios
 planificados o series.
 
+## API de workouts
+
+Los entrenamientos realizados se exponen bajo `/api/v1/workouts`:
+
+| Metodo y ruta | Comportamiento |
+|---|---|
+| `POST /api/v1/workouts` | Inicia una sesion `in_progress` para `userId`, `routineVersionId` y `startedAt`. |
+| `PUT /api/v1/workouts/:id/exercises/:routineExerciseId` | Registra o reemplaza atomica e idempotentemente un resultado y su lista completa de sets. |
+| `POST /api/v1/workouts/:id/complete` | Completa la sesion, deriva la duracion y admite RPE/notas finales. |
+| `POST /api/v1/workouts/:id/cancel` | Cancela una sesion en curso sin datos de finalizacion. |
+| `GET /api/v1/workouts?userId=<id>` | Lista el historico mas reciente primero; `status` es un filtro opcional. |
+| `GET /api/v1/workouts/:id?userId=<id>` | Devuelve la version planificada exacta y los resultados reales por separado. |
+
+Todo workout de esta version requiere una version sellada de una rutina propia;
+no existen entrenamientos libres. `startedAt` y `completedAt` deben incluir zona
+horaria y se normalizan a UTC. Cada PUT conserva un unico resultado por
+`routineExerciseId`, mantiene sus IDs por las claves naturales `planned` y
+`setNumber`, y elimina los sets omitidos. El ejercicio ejecutado puede diferir
+del planificado, pero debe estar activo al escribir; ambos identificadores se
+conservan en el historico.
+
+Las sesiones `completed` y `cancelled` son terminales e irreversibles. Completar
+no exige resultados para todos los ejercicios ni que todos los sets esten
+marcados como ejecutados. Ninguna operacion de workouts modifica `routines`,
+`routine_versions`, `routine_exercises` o `routine_sets`.
+
 ### Usuarios provisionales y ownership
 
 La tabla minima `users` existe solo como dependencia referencial. Esta API no
@@ -156,7 +183,9 @@ obligatorio de cada rutina solo puede referenciar una version propia sellada;
 una guardia diferida y triggers de SQLite protegen completitud, avance unitario,
 seleccion obligatoria e inmutabilidad incluso ante SQL directo. Las tablas de
 rutinas son `STRICT` y rechazan bindings textuales en campos numericos. Las
-columnas enteras expuestas por la API se limitan a `Number.MAX_SAFE_INTEGER`. Las
+columnas enteras expuestas por la API se limitan a `Number.MAX_SAFE_INTEGER`.
+Las FKs compuestas y triggers de workouts protegen propietario, version sellada,
+planificado exacto y bloqueo de hijos al terminar incluso ante SQL directo. Las
 convenciones se detallan en
 [`database/README.md`](database/README.md).
 

@@ -150,6 +150,34 @@ distinguir un `NULL` intencional de un binding `NaN`, que SQLite normaliza a
 TypeScript/JSON estan limitados a `Number.MAX_SAFE_INTEGER`; la asignacion de IDs
 comprueba ese limite antes de calcular `MAX(id) + 1`.
 
+## Entrenamientos realizados
+
+Cada workout referencia obligatoriamente una version sellada de una rutina del
+mismo usuario. Las sesiones libres quedan fuera del contrato actual. FKs
+compuestas enlazan sesion, propietario, rutina, version sellada y ejercicio
+planificado exacto; estas reglas se mantienen tambien ante SQL directo.
+
+La API permite iniciar, registrar por PUT el resultado completo de un ejercicio
+planificado, completar, cancelar, listar y consultar detalle. El PUT conserva un
+unico resultado por `(session, routineExerciseId)` y sincroniza sets por
+`setNumber`: actualiza conservando IDs, inserta los nuevos y elimina los
+omitidos dentro de una transaccion `IMMEDIATE`. Planificacion y ejecucion se
+devuelven en ramas separadas. Una sustitucion conserva el ejercicio planificado
+y el realmente realizado, que debe estar activo en cada escritura pero sigue
+siendo legible si se desactiva despues.
+
+Los estados `completed` y `cancelled` son terminales e irreversibles. Triggers
+bloquean tambien inserts, updates y deletes de hijos una vez terminada la
+sesion. SQLite valida timestamps UTC canonicos, impide finalizar antes del
+inicio y genera la duracion en segundos. Las tablas `workout_*` son `STRICT` y
+siguen los checks de clase numerica, markers nullable y limites seguros de las
+rutinas. Ninguna escritura de workouts modifica una tabla `routine_*`.
+
+El historico exige `userId`, se puede filtrar por estado, carece de paginacion
+en esta version y se ordena por `startedAt DESC, id DESC`. `userId` continua
+siendo un selector de propietario sin autenticacion hasta implementar una spec
+de seguridad aprobada.
+
 ## Operacion
 
 La interfaz de desarrollo se centralizara en `just`, incluyendo instalacion,

@@ -409,7 +409,6 @@ describe("routine API", () => {
     ["planned exercises", "post", "/api/v1/routine-exercises"],
     ["planned sets", "post", "/api/v1/routine-sets"],
     ["users", "get", "/api/v1/users"],
-    ["workouts", "get", "/api/v1/workouts"],
   ])("does not expose %s", async (_label, method, url) => {
     const response =
       await request(app)[method as "delete" | "get" | "patch" | "post"](url);

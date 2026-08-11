@@ -933,10 +933,38 @@
           "check": "",
           "primary": false,
           "unique": false,
-          "notNull": false,
+          "notNull": true,
           "increment": false,
-          "comment": "Versión planificada; nullable si sesión libre",
+          "comment": "Version planificada obligatoria; FK compuesta exige rutina propia sellada",
           "id": 2,
+          "size": "",
+          "values": []
+        },
+        {
+          "name": "routine_id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "Guardia de rutina y propietario para FK compuesta",
+          "id": 10,
+          "size": "",
+          "values": []
+        },
+        {
+          "name": "routine_version_is_sealed",
+          "type": "INTEGER",
+          "default": "1",
+          "check": "= 1",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "Guardia interna de version sellada",
+          "id": 11,
           "size": "",
           "values": []
         },
@@ -997,6 +1025,20 @@
           "values": []
         },
         {
+          "name": "overall_rpe_is_set",
+          "type": "INTEGER",
+          "default": "0",
+          "check": "IN (0, 1)",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "Marker interno para distinguir NULL de NaN",
+          "id": 12,
+          "size": "",
+          "values": []
+        },
+        {
           "name": "status",
           "type": "TEXT",
           "default": "",
@@ -1039,7 +1081,7 @@
           "values": []
         }
       ],
-      "comment": "",
+      "comment": "Tabla STRICT; timestamps UTC canonicos, duracion generada, FKs compuestas y estados terminales protegidos por triggers",
       "indices": [],
       "color": "#54a0ff"
     },
@@ -1084,10 +1126,24 @@
           "check": "",
           "primary": false,
           "unique": false,
-          "notNull": false,
+          "notNull": true,
           "increment": false,
           "comment": "Elemento planificado original",
           "id": 2,
+          "size": "",
+          "values": []
+        },
+        {
+          "name": "routine_version_id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "Guardia para exigir planned de la version de sesion",
+          "id": 6,
           "size": "",
           "values": []
         },
@@ -1134,7 +1190,7 @@
           "values": []
         }
       ],
-      "comment": "",
+      "comment": "Tabla STRICT; conserva planned y performed, con unicidad por planned y posicion real",
       "indices": [],
       "color": "#5f27cd"
     },
@@ -1297,9 +1353,79 @@
           "id": 10,
           "size": "",
           "values": []
+        },
+        {
+          "name": "weight_kg_is_set",
+          "type": "INTEGER",
+          "default": "",
+          "check": "IN (0, 1)",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "Marker interno para distinguir NULL de NaN",
+          "id": 11,
+          "size": "",
+          "values": []
+        },
+        {
+          "name": "reps_is_set",
+          "type": "INTEGER",
+          "default": "",
+          "check": "IN (0, 1)",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "Marker interno para distinguir NULL de NaN",
+          "id": 12,
+          "size": "",
+          "values": []
+        },
+        {
+          "name": "duration_seconds_is_set",
+          "type": "INTEGER",
+          "default": "",
+          "check": "IN (0, 1)",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "Marker interno para distinguir NULL de NaN",
+          "id": 13,
+          "size": "",
+          "values": []
+        },
+        {
+          "name": "rpe_is_set",
+          "type": "INTEGER",
+          "default": "",
+          "check": "IN (0, 1)",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "Marker interno para distinguir NULL de NaN",
+          "id": 14,
+          "size": "",
+          "values": []
+        },
+        {
+          "name": "pain_level_is_set",
+          "type": "INTEGER",
+          "default": "",
+          "check": "IN (0, 1)",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "Marker interno para distinguir NULL de NaN",
+          "id": 15,
+          "size": "",
+          "values": []
         }
       ],
-      "comment": "",
+      "comment": "Tabla STRICT; IDs estables por set_number y escritura bloqueada cuando la sesion es terminal",
       "indices": [],
       "color": "#10ac84"
     },
@@ -1737,6 +1863,17 @@
       "updateConstraint": "No action",
       "deleteConstraint": "No action",
       "id": 14
+    },
+    {
+      "startTableId": 6,
+      "startFieldId": 10,
+      "endTableId": 2,
+      "endFieldId": 0,
+      "name": "workout_sessions_routine_id_fk",
+      "cardinality": "many_to_one",
+      "updateConstraint": "No action",
+      "deleteConstraint": "No action",
+      "id": 15
     }
   ],
   "notes": [],

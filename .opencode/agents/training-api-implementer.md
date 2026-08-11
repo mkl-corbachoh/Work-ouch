@@ -1,4 +1,6 @@
 ---
+model: openai/gpt-5.6-luna
+---
 description: >-
   Use this agent when an approved plan, specification, ticket, or clearly scoped
   request needs to be implemented in the Training API project. Invoke it for new

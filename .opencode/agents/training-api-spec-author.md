@@ -1,4 +1,6 @@
 ---
+model: openai/gpt-5.6-terra
+---
 description: >-
   Use this agent when you need to author, refine, reconcile, or review technical
   specifications for the Training API project, including endpoint contracts,

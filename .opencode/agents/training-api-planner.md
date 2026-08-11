@@ -1,4 +1,6 @@
 ---
+model: openai/gpt-5.6-sol
+---
 description: >-
   Use this agent when you need an implementation-ready technical plan for a new
   feature, change, integration, migration, or architectural decision in the

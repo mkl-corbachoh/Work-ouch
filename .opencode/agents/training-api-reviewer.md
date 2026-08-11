@@ -1,4 +1,6 @@
 ---
+model: openai/gpt-5.6-terra
+---
 description: >-
   Use this agent when a logical chunk of recently written or modified Training
   API code is ready for review, before merging, submitting, or continuing to

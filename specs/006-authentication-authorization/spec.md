@@ -1,5 +1,5 @@
 ---
-status: draft
+status: cancel
 ---
 
 # 006 - Autenticacion y autorizacion

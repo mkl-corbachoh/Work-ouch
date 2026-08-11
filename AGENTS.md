@@ -12,7 +12,7 @@
 ## Current Bootstrap State
 
 - The Node.js project, npm lockfile, Justfile, application foundation, migration runner, and executable checks now exist; use the documented `just` recipes.
-- Spec 001 is implemented and verified locally but remains `in_progress` because Docker image and persistence verification is blocked by unavailable daemon access. Its tasks 7-8 remain open; specs 002-005 remain drafts.
+- Specs 001 and 002 are completed, including user-confirmed Docker verification for spec 001; specs 003-005 remain drafts.
 - User endpoints have no owning spec yet. Do not place them into `001-project-foundation` or another spec without resolving the open decision in `docs/architecture.md`.
 - Spec 001 fixes Node.js 24 LTS, npm, and Biome. Initial pagination remains undecided and outside spec 001.
 

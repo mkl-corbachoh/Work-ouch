@@ -1,5 +1,5 @@
 ---
-status: in_progress
+status: completed
 ---
 
 # 001 - Base del proyecto

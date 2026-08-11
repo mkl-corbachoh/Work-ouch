@@ -6,6 +6,7 @@ import {
   openDatabase,
   type SqliteDatabase,
 } from "../../src/db/connection";
+import { runMigrations } from "../../src/db/migrations";
 
 const DEVELOPMENT_DATABASE = resolve("./data/training.db");
 
@@ -35,6 +36,18 @@ export function createTemporaryDatabase(): TemporaryDatabase {
       rmSync(directory, { recursive: true, force: true });
     },
   };
+}
+
+export function createMigratedTemporaryDatabase(): TemporaryDatabase {
+  const temporary = createTemporaryDatabase();
+
+  try {
+    runMigrations(temporary.database, resolve("database/migrations"));
+    return temporary;
+  } catch (error) {
+    temporary.cleanup();
+    throw error;
+  }
 }
 
 export function assertNotDevelopmentDatabase(databasePath: string): void {

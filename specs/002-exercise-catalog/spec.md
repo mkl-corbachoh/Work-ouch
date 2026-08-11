@@ -1,5 +1,5 @@
 ---
-status: draft
+status: completed
 ---
 
 # 002 - Catalogo de ejercicios

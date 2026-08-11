@@ -1,6 +1,7 @@
 import express, { type Express } from "express";
 import type { Logger } from "pino";
 import type { SqliteDatabase } from "./db/connection";
+import { createExerciseRouter } from "./modules/exercises/exercise.routes";
 import { errorHandler, HttpError, notFoundHandler } from "./shared/http-errors";
 import { requestLogger } from "./shared/request-logger";
 
@@ -14,6 +15,7 @@ export function createApp({ database, logger }: AppDependencies): Express {
 
   app.disable("x-powered-by");
   app.use(requestLogger(logger));
+  app.use(express.json());
 
   app.get("/health", (_request, response, next) => {
     try {
@@ -31,6 +33,8 @@ export function createApp({ database, logger }: AppDependencies): Express {
       );
     }
   });
+
+  app.use("/api/v1/exercises", createExerciseRouter(database));
 
   app.use(notFoundHandler);
   app.use(errorHandler(logger));

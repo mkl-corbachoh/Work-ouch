@@ -1,8 +1,8 @@
 # work-ouch! Training API
 
-Base de una API REST de entrenamiento construida con Node.js 24, TypeScript,
-Express y SQLite. Esta version solo incluye infraestructura y `GET /health`; no
-incluye recursos funcionales del dominio.
+API REST de entrenamiento construida con Node.js 24, TypeScript, Express y
+SQLite. Esta version incluye la infraestructura base, `GET /health` y el
+catalogo global de ejercicios.
 
 ## Requisitos
 
@@ -45,6 +45,26 @@ just start      # ejecuta node dist/server.js
 ```
 
 Los tests nunca deben usar `./data/training.db`.
+
+## API de ejercicios
+
+El catalogo se expone bajo `/api/v1/exercises`:
+
+| Metodo y ruta | Comportamiento |
+|---|---|
+| `POST /api/v1/exercises` | Crea un ejercicio; `slug` y `name` son obligatorios. |
+| `GET /api/v1/exercises` | Lista ejercicios activos. |
+| `GET /api/v1/exercises?includeInactive=true` | Incluye tambien los ejercicios inactivos. |
+| `GET /api/v1/exercises/:id` | Obtiene un ejercicio, aunque este inactivo. |
+| `PATCH /api/v1/exercises/:id` | Actualiza campos editoriales o `isActive`; no permite cambiar `slug`. |
+
+El listado no tiene paginacion en esta version y mantiene el orden determinista
+por nombre sin distinguir mayusculas, nombre exacto e identificador. Solo se
+aceptan los valores literales `true` y `false` para `includeInactive`.
+
+No existe borrado fisico. Un ejercicio se desactiva con
+`PATCH { "isActive": false }` y puede reactivarse enviando `true`; su consulta
+directa y sus referencias historicas se conservan.
 
 ## Base de datos
 

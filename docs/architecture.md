@@ -52,6 +52,12 @@ realizado.
 Las mediciones corporales usan un catalogo de tipos y valores asociados para
 permitir nuevas metricas sin alterar el esquema.
 
+El catalogo inicial de ejercicios se lista sin paginacion y con orden estable
+por nombre (`NOCASE`, luego binario) e identificador. Por defecto solo muestra
+activos; `includeInactive=true` incorpora tambien los inactivos. La
+desactivacion es reversible mediante actualizacion y no existe borrado fisico.
+Esta decision no fija el contrato de paginacion de listas futuras.
+
 ## Estructura prevista
 
 ```text
@@ -112,8 +118,8 @@ errores, sin registrar cuerpos completos por defecto.
 - Los endpoints de usuarios estan requeridos, pero ninguna de las cinco specs
   funcionales los incluye y `001-project-foundation` se limita expresamente a
   infraestructura. Debe decidirse si ampliar `001` o crear una spec de usuarios.
-- Falta decidir si las listas iniciales necesitan paginacion desde la primera
-  version o si se incorpora cuando exista volumen real.
+- Falta decidir el contrato de paginacion para futuras listas; el catalogo
+  inicial de ejercicios se mantiene expresamente sin paginacion.
 - El esquema adjunto no expresa todas las restricciones compuestas ni las
   reglas entre propietarios. Se concretaran en los planes mediante constraints,
   indices y validaciones transaccionales.

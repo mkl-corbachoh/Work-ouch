@@ -54,7 +54,7 @@ el `Justfile`, se usaran sus recetas para todas las comprobaciones.
     con `just start`; `PORT=0 just start` y `NODE_ENV=invalid just start` deben
     fallar sin abrir puerto.
 
-- [ ] **7. Anadir empaquetado y ejecucion Docker**
+- [x] **7. Anadir empaquetado y ejecucion Docker**
   - Crear `.dockerignore`, Dockerfile multi-stage Node 24 y `compose.yaml`.
   - Ejecutar JavaScript compilado como usuario no root con volumen escribible en
     `/app/data` y health check.
@@ -62,12 +62,10 @@ el `Justfile`, se usaran sus recetas para todas las comprobaciones.
     `/health`, crear un marcador en `/app/data`, recrear el contenedor y
     comprobar que persiste; eliminarlo y ejecutar `just docker-down`.
   - Confirmar en imagen y logs que se ejecuta `dist/server.js`, no TypeScript.
-  - Bloqueo de verificacion (2026-08-10): `docker compose config` es valido,
-    pero `just docker-build` y `just docker-up` no pueden acceder a
-    `/var/run/docker.sock` en este entorno (`permission denied`). La prueba de
-    imagen y persistencia queda pendiente.
+  - Verificacion Docker completada por el usuario el 2026-08-11 tras habilitar
+    el acceso de su usuario al daemon.
 
-- [ ] **8. Documentar y ejecutar la verificacion final de la spec**
+- [x] **8. Documentar y ejecutar la verificacion final de la spec**
   - Crear README con requisitos, entorno, flujos locales, base de datos, tests y
     Docker; advertir que reset destruye datos y seeds son explicitos.
   - Confirmar que no se anadieron modelos, tablas, endpoints ni modulos
@@ -78,5 +76,5 @@ el `Justfile`, se usaran sus recetas para todas las comprobaciones.
     prueba de persistencia de `/app/data`, y `just docker-down`.
   - Marcar esta tarea y cambiar la spec a `completed` solo si todos los comandos
     y criterios de aceptacion pasan.
-  - Verificacion final no Docker completada el 2026-08-10. Esta tarea permanece
-    abierta por el bloqueo de Docker descrito en la tarea 7.
+  - Verificacion local automatizada completada el 2026-08-10 y verificacion
+    Docker confirmada por el usuario el 2026-08-11.

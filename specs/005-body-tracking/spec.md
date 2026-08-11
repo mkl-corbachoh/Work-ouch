@@ -1,5 +1,5 @@
 ---
-status: draft
+status: completed
 ---
 
 # 005 - Seguimiento corporal

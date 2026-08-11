@@ -178,6 +178,29 @@ en esta version y se ordena por `startedAt DESC, id DESC`. `userId` continua
 siendo un selector de propietario sin autenticacion hasta implementar una spec
 de seguridad aprobada.
 
+## Seguimiento corporal
+
+El catalogo global `body_metric_types` permite anadir metricas como datos sin
+alterar el esquema. Las mediciones inmutables se separan entre
+`body_measurements` y `body_measurement_values`; sus respuestas indexan cada
+valor por `code` como `{value, unit}` y no exponen IDs de tipos o valores. Los
+nueve tipos iniciales se cargan con un seed explicito, idempotente y sin
+usuarios; el arranque solo aplica migraciones.
+
+Las tres tablas son `STRICT`, usan numericos `ANY` con checks de clase y limitan
+IDs a `Number.MAX_SAFE_INTEGER`. Los valores admiten enteros, fracciones, cero y
+negativos, pero rechazan texto, infinitos y `NaN`, que SQLite normaliza a
+`NULL`. La escritura reserva IDs en una transaccion `IMMEDIATE`, resuelve todos
+los codes y despues inserta primero todos los valores. Solo entonces inserta la
+cabecera; una FK diferida impide confirmar huerfanos y triggers impiden
+cabeceras vacias, valores posteriores, `OR REPLACE`, updates y deletes.
+
+La API crea y lista tipos, y crea, lista y consulta mediciones bajo el usuario
+de la ruta. El detalle combina medicion y propietario en la misma busqueda para
+ocultar recursos ajenos. El historico carece de paginacion, se aisla por
+`userId` y se ordena por `measuredAt DESC, id DESC`; `userId` sigue siendo un
+selector provisional, no autenticacion.
+
 ## Operacion
 
 La interfaz de desarrollo se centralizara en `just`, incluyendo instalacion,

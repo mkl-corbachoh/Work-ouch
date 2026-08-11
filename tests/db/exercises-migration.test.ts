@@ -60,6 +60,7 @@ describe("exercise migration", () => {
         "0002_create_users.sql",
         "0003_create_routines.sql",
         "0004_create_workouts.sql",
+        "0005_create_body_tracking.sql",
       ],
     });
 
@@ -90,7 +91,7 @@ describe("exercise migration", () => {
       temporary.database
         .prepare("SELECT COUNT(*) AS count FROM schema_migrations")
         .get(),
-    ).toEqual({ count: 4 });
+    ).toEqual({ count: 5 });
   });
 
   it.each([

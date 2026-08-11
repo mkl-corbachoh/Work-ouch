@@ -2,6 +2,10 @@ import express, { type Express } from "express";
 import type { Logger } from "pino";
 import type { SqliteDatabase } from "./db/connection";
 import { createExerciseRouter } from "./modules/exercises/exercise.routes";
+import {
+  createBodyMetricTypeRouter,
+  createMeasurementRouter,
+} from "./modules/measurements/measurement.routes";
 import { createRoutineRouter } from "./modules/routines/routine.routes";
 import { createWorkoutRouter } from "./modules/workouts/workout.routes";
 import { errorHandler, HttpError, notFoundHandler } from "./shared/http-errors";
@@ -37,6 +41,11 @@ export function createApp({ database, logger }: AppDependencies): Express {
   });
 
   app.use("/api/v1/exercises", createExerciseRouter(database));
+  app.use("/api/v1/body-metric-types", createBodyMetricTypeRouter(database));
+  app.use(
+    "/api/v1/users/:userId/measurements",
+    createMeasurementRouter(database),
+  );
   app.use("/api/v1/routines", createRoutineRouter(database));
   app.use("/api/v1/workouts", createWorkoutRouter(database));
 

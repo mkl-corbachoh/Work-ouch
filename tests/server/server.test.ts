@@ -71,6 +71,24 @@ describe("server lifecycle", () => {
     expect(databaseFactory).not.toHaveBeenCalled();
   });
 
+  it("applies real migrations at startup without running explicit seeds", async () => {
+    const { logger } = createCapturedLogger();
+    running = await startServer(
+      {
+        databasePath: join(directory, "training.db"),
+        port: 0,
+        nodeEnv: "test",
+      },
+      { logger },
+    );
+
+    expect(
+      running.database
+        .prepare("SELECT COUNT(*) AS count FROM body_metric_types")
+        .get(),
+    ).toEqual({ count: 0 });
+  });
+
   it("does not listen and closes SQLite when a migration fails", async () => {
     writeFileSync(join(migrationsDirectory, "0001_broken.sql"), "INVALID SQL;");
     let database: SqliteDatabase | undefined;

@@ -3,7 +3,7 @@
 API REST de entrenamiento construida con Node.js 24, TypeScript, Express y
 SQLite. Esta version incluye la infraestructura base, `GET /health`, el
 catalogo global de ejercicios, la planificacion de rutinas versionadas y el
-registro de entrenamientos realizados.
+registro de entrenamientos realizados y de mediciones corporales.
 
 ## Requisitos
 
@@ -161,6 +161,43 @@ no exige resultados para todos los ejercicios ni que todos los sets esten
 marcados como ejecutados. Ninguna operacion de workouts modifica `routines`,
 `routine_versions`, `routine_exercises` o `routine_sets`.
 
+## API de seguimiento corporal
+
+El catalogo global y las mediciones se exponen mediante:
+
+| Metodo y ruta | Comportamiento |
+|---|---|
+| `GET /api/v1/body-metric-types` | Lista tipos por `code`. |
+| `POST /api/v1/body-metric-types` | Crea un tipo global extensible. |
+| `POST /api/v1/users/:userId/measurements` | Crea atomica e inmutablemente una medicion con una o mas metricas. |
+| `GET /api/v1/users/:userId/measurements` | Lista el historico completo mas reciente primero. |
+| `GET /api/v1/users/:userId/measurements/:id` | Obtiene solo una medicion propiedad del usuario de la ruta. |
+
+`measuredAt` requiere zona horaria y se devuelve en UTC. `metrics` usa los
+codigos del catalogo y cada respuesta presenta `{ "value": numero, "unit":
+unidad }`, sin IDs internos. Se aceptan valores finitos positivos, cero y
+negativos; el dominio clinico de cada tipo no se impone genericamente. Por
+ejemplo:
+
+```json
+{
+  "measuredAt": "2026-08-11T08:00:00+02:00",
+  "source": "Scale",
+  "notes": null,
+  "metrics": {
+    "weight_kg": 72.4,
+    "bmi": 22.7,
+    "body_fat_pct": 15.2
+  }
+}
+```
+
+El historico no tiene paginacion en esta version y se ordena por
+`measuredAt DESC, id DESC`. No existen endpoints de edicion o borrado. Un tipo
+nuevo puede crearse y usarse sin migrar SQLite. Los nueve tipos iniciales se
+instalan solo al ejecutar explicitamente `just db-seed`; el arranque no ejecuta
+seeds ni crea usuarios.
+
 ### Usuarios provisionales y ownership
 
 La tabla minima `users` existe solo como dependencia referencial. Esta API no
@@ -186,7 +223,9 @@ rutinas son `STRICT` y rechazan bindings textuales en campos numericos. Las
 columnas enteras expuestas por la API se limitan a `Number.MAX_SAFE_INTEGER`.
 Las FKs compuestas y triggers de workouts protegen propietario, version sellada,
 planificado exacto y bloqueo de hijos al terminar incluso ante SQL directo. Las
-convenciones se detallan en
+mediciones usan tres tablas `STRICT` y un protocolo valores-primero con FK
+diferida: una cabecera vacia, un valor huerfano o una mutacion posterior no puede
+llegar al commit. Las convenciones se detallan en
 [`database/README.md`](database/README.md).
 
 ```sh

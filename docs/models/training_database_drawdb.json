@@ -1437,21 +1437,21 @@
       "fields": [
         {
           "name": "id",
-          "type": "INTEGER",
+          "type": "ANY",
           "default": "",
           "check": "",
           "primary": true,
           "unique": true,
           "notNull": true,
-          "increment": true,
-          "comment": "Medición",
+          "increment": false,
+          "comment": "ID seguro asignado explicitamente",
           "id": 0,
           "size": "",
           "values": []
         },
         {
           "name": "user_id",
-          "type": "INTEGER",
+          "type": "ANY",
           "default": "",
           "check": "",
           "primary": false,
@@ -1472,7 +1472,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": "ISO-8601",
+          "comment": "UTC canonico con milisegundos",
           "id": 2,
           "size": "",
           "values": []
@@ -1514,13 +1514,13 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": "ISO-8601",
+          "comment": "UTC canonico con milisegundos",
           "id": 5,
           "size": "",
           "values": []
         }
       ],
-      "comment": "",
+      "comment": "Tabla STRICT e inmutable; se inserta al final tras todos sus valores",
       "indices": [],
       "color": "#00d2d3"
     },
@@ -1532,14 +1532,14 @@
       "fields": [
         {
           "name": "id",
-          "type": "INTEGER",
+          "type": "ANY",
           "default": "",
           "check": "",
           "primary": true,
           "unique": true,
           "notNull": true,
-          "increment": true,
-          "comment": "Tipo de índice",
+          "increment": false,
+          "comment": "ID seguro asignado explicitamente",
           "id": 0,
           "size": "",
           "values": []
@@ -1601,7 +1601,7 @@
           "values": []
         }
       ],
-      "comment": "",
+      "comment": "Catalogo global STRICT; code e ID son inmutables y DELETE/REPLACE estan bloqueados",
       "indices": [],
       "color": "#feca57"
     },
@@ -1613,21 +1613,21 @@
       "fields": [
         {
           "name": "id",
-          "type": "INTEGER",
+          "type": "ANY",
           "default": "",
           "check": "",
           "primary": true,
           "unique": true,
           "notNull": true,
-          "increment": true,
-          "comment": "Valor",
+          "increment": false,
+          "comment": "ID seguro asignado explicitamente",
           "id": 0,
           "size": "",
           "values": []
         },
         {
           "name": "measurement_id",
-          "type": "INTEGER",
+          "type": "ANY",
           "default": "",
           "check": "",
           "primary": false,
@@ -1641,7 +1641,7 @@
         },
         {
           "name": "metric_type_id",
-          "type": "INTEGER",
+          "type": "ANY",
           "default": "",
           "check": "",
           "primary": false,
@@ -1655,20 +1655,20 @@
         },
         {
           "name": "value",
-          "type": "REAL",
+          "type": "ANY",
           "default": "",
           "check": "",
           "primary": false,
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": "Valor medido",
+          "comment": "Numero finito; admite negativos y cero",
           "id": 3,
           "size": "",
           "values": []
         }
       ],
-      "comment": "",
+      "comment": "Tabla STRICT e inmutable; valores-primero con FK de measurement_id diferida",
       "indices": [],
       "color": "#ff6b6b"
     },

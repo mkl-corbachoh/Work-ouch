@@ -18,7 +18,8 @@
     "format": "biome format --write .",
     "db:migrate": "tsx src/db/cli.ts migrate",
     "db:reset": "tsx src/db/cli.ts reset",
-    "db:seed": "tsx src/db/cli.ts seed"
+    "db:seed": "tsx src/db/cli.ts seed",
+    "db:import": "tsx src/db/cli.ts import"
   },
   "dependencies": {
     "better-sqlite3": "^13.0.3",

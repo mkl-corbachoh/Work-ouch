@@ -3,10 +3,11 @@ import { resolve } from "node:path";
 import type { AppConfig } from "../config";
 import { readConfig } from "../config";
 import { closeDatabase, openDatabase } from "./connection";
+import { importSeedData } from "./import-seed";
 import { type MigrationResult, runMigrations } from "./migrations";
 import { runSeeds } from "./seeds";
 
-export type DatabaseCommand = "migrate" | "reset" | "seed";
+export type DatabaseCommand = "migrate" | "reset" | "seed" | "import";
 
 export type DatabaseDirectories = {
   migrations: string;
@@ -53,7 +54,16 @@ export function executeDatabaseCommand(
   try {
     const migrations = runMigrations(database, directories.migrations);
     const seeds =
-      command === "seed" ? runSeeds(database, directories.seeds) : [];
+      command === "seed" || command === "import"
+        ? runSeeds(database, directories.seeds)
+        : [];
+    const imported =
+      command === "import" ? process.env.SEED_DATA_PATH : undefined;
+    if (command === "import") {
+      if (!imported)
+        throw new Error("SEED_DATA_PATH is required for db:import");
+      importSeedData(database, imported);
+    }
     return { migrations, seeds };
   } finally {
     closeDatabase(database);
@@ -61,10 +71,15 @@ export function executeDatabaseCommand(
 }
 
 function parseCommand(value: string | undefined): DatabaseCommand {
-  if (value === "migrate" || value === "reset" || value === "seed") {
+  if (
+    value === "migrate" ||
+    value === "reset" ||
+    value === "seed" ||
+    value === "import"
+  ) {
     return value;
   }
-  throw new Error("Usage: db:cli <migrate|reset|seed>");
+  throw new Error("Usage: db:cli <migrate|reset|seed|import>");
 }
 
 export function main(

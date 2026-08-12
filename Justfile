@@ -33,6 +33,9 @@ db-reset:
 db-seed:
     npm run db:seed
 
+db-import:
+    npm run db:import
+
 docker-build:
     docker compose build
 

@@ -27,16 +27,27 @@ const expectedTypes = [
 describe("body metric types seed", () => {
   let temporary: TemporaryDatabase;
   let copiedSeedsDirectory: string | undefined;
+  let metricSeedsDirectory: string | undefined;
 
   beforeEach(() => {
     temporary = createTemporaryDatabase();
     runMigrations(temporary.database, MIGRATIONS_DIRECTORY);
+    metricSeedsDirectory = mkdtempSync(
+      join(tmpdir(), "work-ouch-metric-seeds-"),
+    );
+    writeFileSync(
+      join(metricSeedsDirectory, "0001_body_metric_types.sql"),
+      readFileSync(join(SEEDS_DIRECTORY, "0001_body_metric_types.sql"), "utf8"),
+    );
   });
 
   afterEach(() => {
     temporary.cleanup();
     if (copiedSeedsDirectory) {
       rmSync(copiedSeedsDirectory, { recursive: true, force: true });
+    }
+    if (metricSeedsDirectory) {
+      rmSync(metricSeedsDirectory, { recursive: true, force: true });
     }
   });
 
@@ -53,9 +64,9 @@ describe("body metric types seed", () => {
   }
 
   it("creates exactly the nine initial types without creating users", () => {
-    expect(runSeeds(temporary.database, SEEDS_DIRECTORY)).toEqual([
-      "0001_body_metric_types.sql",
-    ]);
+    expect(
+      runSeeds(temporary.database, metricSeedsDirectory as string),
+    ).toEqual(["0001_body_metric_types.sql"]);
     expect(readTypes()).toEqual(expectedTypes);
     expect(
       temporary.database.prepare("SELECT COUNT(*) AS count FROM users").get(),
@@ -72,8 +83,8 @@ describe("body metric types seed", () => {
       )
       .run();
 
-    runSeeds(temporary.database, SEEDS_DIRECTORY);
-    runSeeds(temporary.database, SEEDS_DIRECTORY);
+    runSeeds(temporary.database, metricSeedsDirectory as string);
+    runSeeds(temporary.database, metricSeedsDirectory as string);
 
     expect(
       temporary.database
@@ -102,7 +113,7 @@ describe("body metric types seed", () => {
         `,
       )
       .run();
-    runSeeds(temporary.database, SEEDS_DIRECTORY);
+    runSeeds(temporary.database, metricSeedsDirectory as string);
 
     expect(
       temporary.database

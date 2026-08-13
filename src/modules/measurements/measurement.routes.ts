@@ -78,45 +78,53 @@ export function createBodyMetricTypeRouter(database: SqliteDatabase): Router {
   return router;
 }
 
-export function createMeasurementRouter(database: SqliteDatabase): Router {
+export function createMeasurementRouter(
+  database: SqliteDatabase,
+  authenticated = false,
+): Router {
   const router = Router({ mergeParams: true });
   const service = createService(database);
 
   router.post("/", (request, response) => {
-    const { userId } = parseInput(
-      measurementUserParamsSchema,
-      request.params,
-      "params",
-    );
+    const userId = authenticated
+      ? request.currentUser?.id
+      : parseInput(measurementUserParamsSchema, request.params, "params")
+          .userId;
     parseInput(measurementEmptyQuerySchema, request.query, "query");
     const input = parseInput(createBodyMeasurementSchema, request.body, "body");
     try {
-      response.status(201).json(service.createMeasurement(userId, input));
+      response
+        .status(201)
+        .json(service.createMeasurement(userId as number, input));
     } catch (error) {
       mapDomainError(error);
     }
   });
 
   router.get("/", (request, response) => {
-    const { userId } = parseInput(
-      measurementUserParamsSchema,
-      request.params,
-      "params",
-    );
+    const userId = authenticated
+      ? request.currentUser?.id
+      : parseInput(measurementUserParamsSchema, request.params, "params")
+          .userId;
     parseInput(measurementEmptyQuerySchema, request.query, "query");
     try {
-      response.status(200).json(service.listMeasurements(userId));
+      response.status(200).json(service.listMeasurements(userId as number));
     } catch (error) {
       mapDomainError(error);
     }
   });
 
   router.get("/:id", (request, response) => {
-    const { userId, id } = parseInput(
-      measurementDetailParamsSchema,
-      request.params,
-      "params",
-    );
+    const { userId, id } = authenticated
+      ? {
+          userId: request.currentUser?.id as number,
+          id: parseInput(
+            measurementDetailParamsSchema.omit({ userId: true }),
+            request.params,
+            "params",
+          ).id,
+        }
+      : parseInput(measurementDetailParamsSchema, request.params, "params");
     parseInput(measurementEmptyQuerySchema, request.query, "query");
     try {
       response.status(200).json(service.getMeasurement(id, userId));

@@ -107,10 +107,9 @@ Esta es una guia, no una obligacion de crear archivos vacios ni capas sin uso.
 ## Dependencia provisional de usuarios
 
 Las rutinas referencian una tabla `users` minima para garantizar propiedad con
-una clave foranea real. Hasta que una spec de usuarios defina su ciclo de vida,
-los usuarios se aprovisionan explicitamente fuera de esta API: no existen aun
-endpoints, autenticacion, servicio ni seed de usuarios. Por tanto, `userId`
-selecciona y aisla al propietario, pero no autentica la identidad del cliente.
+una clave foranea real. Los usuarios se aprovisionan mediante el bootstrap de
+autenticacion y las identidades externas se almacenan separadamente; `users.id`
+sigue siendo el identificador interno del dominio.
 
 ## Rutinas versionadas
 
@@ -173,10 +172,9 @@ inicio y genera la duracion en segundos. Las tablas `workout_*` son `STRICT` y
 siguen los checks de clase numerica, markers nullable y limites seguros de las
 rutinas. Ninguna escritura de workouts modifica una tabla `routine_*`.
 
-El historico exige `userId`, se puede filtrar por estado, carece de paginacion
-en esta version y se ordena por `startedAt DESC, id DESC`. `userId` continua
-siendo un selector de propietario sin autenticacion hasta implementar una spec
-de seguridad aprobada.
+El historico se filtra por estado, carece de paginacion en esta version y se
+ordena por `startedAt DESC, id DESC`. En rutas autenticadas, el propietario se
+deriva del usuario actual y no se acepta como selector confiado del cliente.
 
 ## Seguimiento corporal
 
@@ -196,10 +194,9 @@ cabecera; una FK diferida impide confirmar huerfanos y triggers impiden
 cabeceras vacias, valores posteriores, `OR REPLACE`, updates y deletes.
 
 La API crea y lista tipos, y crea, lista y consulta mediciones bajo el usuario
-de la ruta. El detalle combina medicion y propietario en la misma busqueda para
-ocultar recursos ajenos. El historico carece de paginacion, se aisla por
-`userId` y se ordena por `measuredAt DESC, id DESC`; `userId` sigue siendo un
-selector provisional, no autenticacion.
+autenticado. El detalle combina medicion y propietario en la misma busqueda para
+ocultar recursos ajenos. El historico carece de paginacion y se ordena por
+`measuredAt DESC, id DESC`.
 
 ## Operacion
 
@@ -211,7 +208,7 @@ base local por defecto en `./data/training.db`.
 El logging HTTP sera estructurado e incluira metodo, ruta, estado, duracion y
 errores, sin registrar cuerpos completos por defecto.
 
-## Seguridad aprobada pendiente de implementacion
+## Seguridad implementada
 
 Se ha aprobado proteger todos los endpoints funcionales bajo `/api/v1` antes de
 publicar un adaptador MCP remoto. La spec
@@ -219,9 +216,9 @@ publicar un adaptador MCP remoto. La spec
 Server con un Authorization Server externo, access tokens JWT `RS256`, issuer,
 audience, JWKS y scopes. `GET /health` permanecera publico.
 
-Esta decision aun no describe el comportamiento ejecutable: la spec 006 sigue
-en `draft` y la API actual no exige tokens. No se implementara autenticacion
-hasta aprobar su spec, plan y tareas.
+La spec 006 esta aprobada. La API usa `jose` para verificar JWT `RS256` contra
+JWKS remoto, con issuer y audience configurados por entorno. `/health` permanece
+publico y el resto de `/api/v1` requiere identidad externa registrada.
 
 El acceso local y remoto mediante MCP se definira despues en una spec 007. El
 adaptador delegara en la REST y no accedera directamente a SQLite. Su transporte

@@ -35,6 +35,11 @@ describe("server lifecycle", () => {
         databasePath: join(directory, "training.db"),
         port: 0,
         nodeEnv: "test",
+        auth: {
+          issuer: "https://issuer.example",
+          audience: "api",
+          jwksUrl: "https://issuer.example/jwks",
+        },
       },
       { logger, migrationsDirectory },
     );
@@ -78,6 +83,11 @@ describe("server lifecycle", () => {
         databasePath: join(directory, "training.db"),
         port: 0,
         nodeEnv: "test",
+        auth: {
+          issuer: "https://issuer.example",
+          audience: "api",
+          jwksUrl: "https://issuer.example/jwks",
+        },
       },
       { logger },
     );
@@ -99,6 +109,11 @@ describe("server lifecycle", () => {
           databasePath: join(directory, "training.db"),
           port: 0,
           nodeEnv: "test",
+          auth: {
+            issuer: "https://issuer.example",
+            audience: "api",
+            jwksUrl: "https://issuer.example/jwks",
+          },
         },
         {
           migrationsDirectory,
@@ -118,6 +133,11 @@ describe("server lifecycle", () => {
         databasePath: join(directory, "training.db"),
         port: 0,
         nodeEnv: "test",
+        auth: {
+          issuer: "https://issuer.example",
+          audience: "api",
+          jwksUrl: "https://issuer.example/jwks",
+        },
       },
       { migrationsDirectory },
     );

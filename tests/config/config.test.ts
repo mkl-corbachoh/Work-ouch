@@ -24,6 +24,25 @@ describe("configuration", () => {
     });
   });
 
+  it("requires all JWT validation settings together", () => {
+    expect(() =>
+      parseConfig({ AUTH_ISSUER: "https://issuer.example" }),
+    ).toThrow("AUTH_ISSUER, AUTH_AUDIENCE and AUTH_JWKS_URL");
+    expect(
+      parseConfig({
+        AUTH_ISSUER: "https://issuer.example",
+        AUTH_AUDIENCE: "training-api",
+        AUTH_JWKS_URL: "https://issuer.example/.well-known/jwks.json",
+      }),
+    ).toMatchObject({
+      auth: {
+        issuer: "https://issuer.example",
+        audience: "training-api",
+        jwksUrl: "https://issuer.example/.well-known/jwks.json",
+      },
+    });
+  });
+
   it.each([
     ["DATABASE_PATH", { DATABASE_PATH: "" }],
     ["PORT", { PORT: "" }],

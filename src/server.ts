@@ -63,7 +63,24 @@ export async function startServer(
       database,
       options.migrationsDirectory ?? resolve("database/migrations"),
     );
-    httpServer = createServer(createApp({ database, logger }));
+    if (!config.auth) {
+      throw new Error(
+        "AUTH_ISSUER, AUTH_AUDIENCE and AUTH_JWKS_URL are required to start the API",
+      );
+    }
+    httpServer = createServer(
+      createApp({
+        database,
+        logger,
+        authProvider: new (
+          await import("./modules/auth/auth.provider")
+        ).SupabaseAuthProvider(
+          config.auth.issuer,
+          config.auth.audience,
+          config.auth.jwksUrl,
+        ),
+      }),
+    );
     await listen(httpServer, config.port);
   } catch (error) {
     if (httpServer?.listening) {

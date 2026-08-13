@@ -12,8 +12,7 @@
 ## Current Bootstrap State
 
 - The Node.js project, npm lockfile, Justfile, application foundation, migration runner, and executable checks now exist; use the documented `just` recipes.
-- Specs 001-005 are completed, including user-confirmed Docker verification for spec 001. Spec 006 remains draft.
-- Spec 006 defines the approved direction for OAuth authentication required by a future remote MCP adapter, but it must not be implemented while its status remains `draft`. Do not create or implement spec 007 MCP before spec 006 is completed.
+- Specs 001-006 are completed, including user-confirmed Docker verification for spec 001. Spec 006 protects the API with configured external JWT authentication; do not create or implement spec 007 MCP before reviewing the completed auth integration.
 - User endpoints have no owning spec yet. Do not place them into `001-project-foundation` or another spec without resolving the open decision in `docs/architecture.md`.
 - Spec 001 fixes Node.js 24 LTS, npm, and Biome. Initial pagination remains undecided and outside spec 001.
 

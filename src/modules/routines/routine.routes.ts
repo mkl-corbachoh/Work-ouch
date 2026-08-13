@@ -63,13 +63,25 @@ function mapDomainError(error: unknown): never {
   throw error;
 }
 
-export function createRoutineRouter(database: SqliteDatabase): Router {
+export function createRoutineRouter(
+  database: SqliteDatabase,
+  authenticated = false,
+): Router {
   const router = Router();
   const service = new RoutineService(new RoutineRepository(database));
 
   router.post("/", (request, response) => {
     parseInput(routineEmptyQuerySchema, request.query, "query");
-    const input = parseInput(createRoutineSchema, request.body, "body");
+    const input = authenticated
+      ? {
+          ...parseInput(
+            createRoutineSchema.omit({ userId: true }),
+            request.body,
+            "body",
+          ),
+          userId: request.currentUser?.id as number,
+        }
+      : parseInput(createRoutineSchema, request.body, "body");
     try {
       response.status(201).json(service.create(input));
     } catch (error) {
@@ -80,7 +92,16 @@ export function createRoutineRouter(database: SqliteDatabase): Router {
   router.post("/:id/versions", (request, response) => {
     const { id } = parseInput(routineIdParamsSchema, request.params, "params");
     parseInput(routineEmptyQuerySchema, request.query, "query");
-    const input = parseInput(createRoutineVersionSchema, request.body, "body");
+    const input = authenticated
+      ? {
+          ...parseInput(
+            createRoutineVersionSchema.omit({ userId: true }),
+            request.body,
+            "body",
+          ),
+          userId: request.currentUser?.id as number,
+        }
+      : parseInput(createRoutineVersionSchema, request.body, "body");
     try {
       response.status(201).json(service.createVersion(id, input));
     } catch (error) {
@@ -89,11 +110,17 @@ export function createRoutineRouter(database: SqliteDatabase): Router {
   });
 
   router.get("/", (request, response) => {
-    const { userId } = parseInput(
-      routineListQuerySchema,
-      request.query,
-      "query",
-    );
+    let userId: number;
+    if (authenticated) {
+      parseInput(routineEmptyQuerySchema, request.query, "query");
+      userId = request.currentUser?.id as number;
+    } else {
+      userId = parseInput(
+        routineListQuerySchema,
+        request.query,
+        "query",
+      ).userId;
+    }
     try {
       response.status(200).json(service.list(userId));
     } catch (error) {
@@ -103,11 +130,16 @@ export function createRoutineRouter(database: SqliteDatabase): Router {
 
   router.get("/:id", (request, response) => {
     const { id } = parseInput(routineIdParamsSchema, request.params, "params");
-    const { userId, versionNumber } = parseInput(
-      routineDetailQuerySchema,
-      request.query,
-      "query",
-    );
+    const { userId, versionNumber } = authenticated
+      ? {
+          userId: request.currentUser?.id as number,
+          versionNumber: parseInput(
+            routineDetailQuerySchema.omit({ userId: true }),
+            request.query,
+            "query",
+          ).versionNumber,
+        }
+      : parseInput(routineDetailQuerySchema, request.query, "query");
     try {
       response.status(200).json(service.get(id, userId, versionNumber));
     } catch (error) {

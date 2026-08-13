@@ -106,13 +106,25 @@ function mapDomainError(error: unknown): never {
   throw error;
 }
 
-export function createWorkoutRouter(database: SqliteDatabase): Router {
+export function createWorkoutRouter(
+  database: SqliteDatabase,
+  authenticated = false,
+): Router {
   const router = Router();
   const service = new WorkoutService(new WorkoutRepository(database));
 
   router.post("/", (request, response) => {
     parseInput(workoutEmptyQuerySchema, request.query, "query");
-    const input = parseInput(startWorkoutSchema, request.body, "body");
+    const input = authenticated
+      ? {
+          ...parseInput(
+            startWorkoutSchema.omit({ userId: true }),
+            request.body,
+            "body",
+          ),
+          userId: request.currentUser?.id as number,
+        }
+      : parseInput(startWorkoutSchema, request.body, "body");
     try {
       response.status(201).json(service.start(input));
     } catch (error) {
@@ -127,7 +139,16 @@ export function createWorkoutRouter(database: SqliteDatabase): Router {
       "params",
     );
     parseInput(workoutEmptyQuerySchema, request.query, "query");
-    const input = parseInput(putWorkoutExerciseSchema, request.body, "body");
+    const input = authenticated
+      ? {
+          ...parseInput(
+            putWorkoutExerciseSchema.omit({ userId: true }),
+            request.body,
+            "body",
+          ),
+          userId: request.currentUser?.id as number,
+        }
+      : parseInput(putWorkoutExerciseSchema, request.body, "body");
     try {
       response
         .status(200)
@@ -140,7 +161,16 @@ export function createWorkoutRouter(database: SqliteDatabase): Router {
   router.post("/:id/complete", (request, response) => {
     const { id } = parseInput(workoutIdParamsSchema, request.params, "params");
     parseInput(workoutEmptyQuerySchema, request.query, "query");
-    const input = parseInput(completeWorkoutSchema, request.body, "body");
+    const input = authenticated
+      ? {
+          ...parseInput(
+            completeWorkoutSchema.omit({ userId: true }),
+            request.body,
+            "body",
+          ),
+          userId: request.currentUser?.id as number,
+        }
+      : parseInput(completeWorkoutSchema, request.body, "body");
     try {
       response.status(200).json(service.complete(id, input));
     } catch (error) {
@@ -151,7 +181,17 @@ export function createWorkoutRouter(database: SqliteDatabase): Router {
   router.post("/:id/cancel", (request, response) => {
     const { id } = parseInput(workoutIdParamsSchema, request.params, "params");
     parseInput(workoutEmptyQuerySchema, request.query, "query");
-    const { userId } = parseInput(cancelWorkoutSchema, request.body, "body");
+    let userId: number;
+    if (authenticated) {
+      parseInput(
+        cancelWorkoutSchema.omit({ userId: true }),
+        request.body,
+        "body",
+      );
+      userId = request.currentUser?.id as number;
+    } else {
+      userId = parseInput(cancelWorkoutSchema, request.body, "body").userId;
+    }
     try {
       response.status(200).json(service.cancel(id, userId));
     } catch (error) {
@@ -160,11 +200,16 @@ export function createWorkoutRouter(database: SqliteDatabase): Router {
   });
 
   router.get("/", (request, response) => {
-    const { userId, status } = parseInput(
-      workoutListQuerySchema,
-      request.query,
-      "query",
-    );
+    const { userId, status } = authenticated
+      ? {
+          userId: request.currentUser?.id as number,
+          status: parseInput(
+            workoutListQuerySchema.omit({ userId: true }),
+            request.query,
+            "query",
+          ).status,
+        }
+      : parseInput(workoutListQuerySchema, request.query, "query");
     try {
       response.status(200).json(service.list(userId, status));
     } catch (error) {
@@ -174,11 +219,17 @@ export function createWorkoutRouter(database: SqliteDatabase): Router {
 
   router.get("/:id", (request, response) => {
     const { id } = parseInput(workoutIdParamsSchema, request.params, "params");
-    const { userId } = parseInput(
-      workoutDetailQuerySchema,
-      request.query,
-      "query",
-    );
+    let userId: number;
+    if (authenticated) {
+      parseInput(workoutEmptyQuerySchema, request.query, "query");
+      userId = request.currentUser?.id as number;
+    } else {
+      userId = parseInput(
+        workoutDetailQuerySchema,
+        request.query,
+        "query",
+      ).userId;
+    }
     try {
       response.status(200).json(service.get(id, userId));
     } catch (error) {

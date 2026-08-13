@@ -116,7 +116,7 @@ describe("routines migration", () => {
     temporary.database.exec("ROLLBACK");
   }
 
-  it("applies 0001-0005 once and creates the routine aggregate tables", () => {
+  it("applies 0001-0006 once and creates the routine aggregate tables", () => {
     expect(runMigrations(temporary.database, MIGRATIONS_DIRECTORY)).toEqual({
       applied: [],
       skipped: [
@@ -125,6 +125,7 @@ describe("routines migration", () => {
         "0003_create_routines.sql",
         "0004_create_workouts.sql",
         "0005_create_body_tracking.sql",
+        "0006_create_user_identities.sql",
       ],
     });
     expect(
@@ -148,7 +149,7 @@ describe("routines migration", () => {
       temporary.database
         .prepare("SELECT COUNT(*) AS count FROM schema_migrations")
         .get(),
-    ).toEqual({ count: 5 });
+    ).toEqual({ count: 6 });
     const strictTables = temporary.database
       .prepare("PRAGMA table_list")
       .all() as Array<{ name: string; strict: 0 | 1 }>;

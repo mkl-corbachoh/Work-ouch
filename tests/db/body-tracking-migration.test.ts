@@ -120,7 +120,7 @@ describe("body tracking migration", () => {
     }
   }
 
-  it("applies 0001-0005 once and creates three strict tables", () => {
+  it("applies 0001-0006 once and creates three strict tables", () => {
     expect(runMigrations(temporary.database, MIGRATIONS_DIRECTORY)).toEqual({
       applied: [],
       skipped: [
@@ -129,6 +129,7 @@ describe("body tracking migration", () => {
         "0003_create_routines.sql",
         "0004_create_workouts.sql",
         "0005_create_body_tracking.sql",
+        "0006_create_user_identities.sql",
       ],
     });
     const tables = temporary.database

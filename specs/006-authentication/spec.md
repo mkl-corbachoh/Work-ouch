@@ -1,7 +1,7 @@
 # 006 — Authentication and External Identity
 
 ```yaml
-status: draft
+status: completed
 ```
 
 ## Objective

@@ -251,3 +251,18 @@ Compose ejecuta el JavaScript compilado como usuario no root. La base se guarda
 en `/app/data/training.db` dentro del volumen nombrado `training_data`.
 `just docker-down` conserva ese volumen; para eliminar tambien los datos debe
 usarse de forma deliberada `docker compose down --volumes`.
+# Cliente web
+
+El SPA vive en `web/` y se ejecuta con React 19, Vite y TypeScript estricto.
+Instala y verifica con `just web-install`, `just web-dev`, `just web-test`,
+`just web-lint`, `just web-typecheck` y `just web-build`.
+
+Configura en `web/.env` las variables públicas `VITE_SUPABASE_URL`,
+`VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_AUTH_PROVIDERS` y
+`VITE_AUTH_SCOPES_JSON`. `WEB_API_PROXY_TARGET` es solo del servidor Vite y por
+defecto apunta a `http://127.0.0.1:3000`; nunca se configura una base absoluta
+de API en el navegador.
+
+En producción, sirve el build estático y la Training API bajo el mismo origen:
+`/` debe tener fallback a `index.html` y `/api/v1/*` debe reenviar a la API. Esta
+topología evita requerir CORS y no modifica el backend.

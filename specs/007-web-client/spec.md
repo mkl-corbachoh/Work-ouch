@@ -1,15 +1,14 @@
 ---
-status: draft
+status: completed
 ---
 
 # 007 - Cliente web
 
 ## Estado y condicion de avance
 
-Esta propuesta permanece en `draft`. No autoriza implementar el frontend ni
-modificar el backend. Debe revisarse expresamente y cambiarse de estado antes de
-ejecutar una tarea de implementacion de `tasks.md`. Las puertas de decision de
-ese documento son una checklist de revision, no tareas de implementacion.
+Implementacion aprobada por el usuario el 2026-08-15. La futura integracion MCP se
+reserva para la spec 009; la 008 queda reservada para trabajo separado de
+despliegue/entorno de autenticacion externa.
 
 La numeracion tambien requiere aprobacion: `docs/architecture.md` reservaba
 conceptualmente la spec 007 para MCP. Aprobar esta spec implica reservar 007
@@ -284,15 +283,17 @@ Antes de aprobar la implementacion deben decidirse:
 
 ## Criterios de aceptacion
 
-- La spec sigue en `draft` hasta una revision expresa.
-- La numeracion 007 frente a la futura spec MCP se resuelve antes de aprobarla.
+- La spec fue aprobada el 2026-08-15 y completada tras pasar las verificaciones
+  automatizadas requeridas.
+- La numeracion 007 queda reservada al cliente web; MCP se reserva para 009.
 - El frontend reside completamente bajo `web/` y no altera contratos del
   backend.
 - El cliente usa React, Vite y TypeScript estricto y funciona desde 320 px hasta
   escritorio.
 - Desarrollo solicita rutas relativas `/api/v1` y Vite las proxifica a la API
   sin reescribir el prefijo.
-- La documentacion de despliegue recomienda y verifica en un smoke representativo
+- La documentacion de despliegue recomienda y verifica mediante un contrato
+  representativo
   el mismo origen para SPA y `/api/v1`; no depende de CORS que el backend actual
   no implementa.
 - Toda llamada funcional incluye el bearer token vigente y nunca envia

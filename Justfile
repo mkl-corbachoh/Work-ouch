@@ -47,3 +47,26 @@ docker-down:
 
 docker-logs:
     docker compose logs -f api
+
+web-install:
+    npm --prefix web ci
+web-dev:
+    npm --prefix web run dev
+web-lint:
+    npm --prefix web run lint
+web-typecheck:
+    npm --prefix web run typecheck
+web-test:
+    npm --prefix web run test
+web-build:
+    npm --prefix web run build
+web-e2e:
+    npm --prefix web run e2e
+verify:
+    npm run lint
+    npm run test
+    npm --prefix web run lint
+    npm --prefix web run typecheck
+    npm --prefix web run test
+    npm run build
+    npm --prefix web run build

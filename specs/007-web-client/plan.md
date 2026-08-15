@@ -2,9 +2,8 @@
 
 ## Condicion previa
 
-Este plan pertenece a una spec `draft` y no debe ejecutarse. Antes de comenzar
-deben aprobarse el alcance, la numeracion, las decisiones OAuth/OIDC y la
-direccion visual canonica descrita en `.stitch/`.
+Este plan fue aprobado para implementacion el 2026-08-15. No incluye cambios de
+backend, CORS, MCP ni despliegue de autenticacion externa.
 
 ## Arquitectura del frontend
 

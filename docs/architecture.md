@@ -74,6 +74,9 @@ specs/
   004-workouts/
   005-body-tracking/
   006-authentication-authorization/
+  007-web-client/
+  008-web-deployment/
+  009-mcp/
 src/
   app.ts
   server.ts
@@ -207,6 +210,14 @@ base local por defecto en `./data/training.db`.
 
 El logging HTTP sera estructurado e incluira metodo, ruta, estado, duracion y
 errores, sin registrar cuerpos completos por defecto.
+
+## Cliente web
+
+La spec `007-web-client` reserva el numero 007 para el SPA mobile-first bajo
+`web/`. Usa rutas relativas `/api/v1`, proxy Vite en desarrollo y topologia de
+mismo origen en produccion (`/` para estaticos con fallback SPA y `/api/v1/*`
+para la API). No cambia backend, CORS ni contratos REST. La futura spec MCP es
+009; 008 se reserva para despliegue y entorno de autenticacion externa.
 
 ## Seguridad implementada
 

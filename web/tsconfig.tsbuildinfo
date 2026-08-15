@@ -1,0 +1,1 @@
+{"root":["./src/api.ts","./src/auth.ts","./src/env.ts","./src/main.tsx","./src/routineBuilder.ts","./src/topology.ts","./src/types.ts","./src/vite-env.d.ts","./src/workoutDraft.ts","./vite.config.ts"],"version":"5.9.3"}

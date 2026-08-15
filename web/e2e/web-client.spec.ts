@@ -4,7 +4,11 @@ import { expect, test, type Page } from "@playwright/test";
 const exercise = { id: 1, slug: "back-squat", name: "Back squat", movementPattern: "squat", equipment: "barbell", isActive: true };
 const planning = { name: "Strength", version: { id: 10, versionNumber: 1, name: "Day A", notes: null, isCurrent: true, exercises: [{ id: 20, exerciseId: 1, position: 1, restSeconds: 90, targetRpe: null, notes: null, exercise, sets: [{ id: 30, setNumber: 1, setType: "work", targetWeightKg: 50, targetRepsMin: 5, targetRepsMax: 5, targetSeconds: null, targetRpe: null, notes: null }] }] } };
 const workout = { id: 7, status: "in_progress", routineVersionId: 10, startedAt: "2026-01-01T10:00:00.000Z", planning, results: [{ routineExerciseId: 20, exerciseId: 1, notes: "keep this note", sets: [{ setNumber: 1, weightKg: 72.5, reps: 4, durationSeconds: null, rpe: 9, completed: true, painLevel: 2, painArea: "knee", notes: "preserve me" }] }] };
-async function expectAccessible(page: Page) { const result = await new AxeBuilder({ page }).analyze(); expect(result.violations, result.violations.map((violation) => violation.id).join(", ")).toEqual([]); }
+async function expectAccessible(page: Page) {
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  const result = await new AxeBuilder({ page }).analyze();
+  expect(result.violations, result.violations.map((violation) => violation.id).join(", ")).toEqual([]);
+}
 
 async function authenticated(page: Page, activeWorkouts: unknown[] = []) {
   await page.addInitScript(() => sessionStorage.setItem("fakeSession", "1"));
@@ -19,7 +23,7 @@ async function authenticated(page: Page, activeWorkouts: unknown[] = []) {
 
 test("login is accessible and callback failure is rendered without leaking details", async ({ page }) => {
   await page.goto("/login");
-  await expect(page.getByRole("heading", { name: "Train with intent." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Train with intent. Measure what matters." })).toBeVisible();
   await expectAccessible(page);
   await page.goto("/auth/callback?code=fail");
   await expect(page.getByText("Sign in could not be completed")).toBeVisible();
@@ -62,6 +66,8 @@ test("routine builder to completed read-only workout preserves actual result val
   await page.getByRole("button", { name: "Add exercise" }).click();
   await page.getByRole("button", { name: "Save complete definition" }).click();
   await page.goto("/workouts/new?routineVersionId=10");
+  await expect(page).toHaveURL(/\/workouts\/7\/active$/);
+  await expect(page.getByRole("heading", { name: "Strength" })).toBeVisible();
   await expectAccessible(page);
   await page.getByRole("button", { name: "Save complete result" }).click();
   await expect(page.getByText("Saved")).toBeVisible();
@@ -71,6 +77,7 @@ test("routine builder to completed read-only workout preserves actual result val
   await page.getByRole("button", { name: "Confirm" }).click();
   await expect(page.getByText("Status: completed")).toBeVisible();
   await expect(page.getByRole("button", { name: "Save complete result" })).toHaveCount(0);
+  await expectAccessible(page);
 });
 
 test("routine builder validates paired reps and serializes multiple duration/range exercises", async ({ page }) => {
@@ -128,7 +135,7 @@ test("unrecoverable API 401 signs out and returns to login", async ({ page }) =>
   await page.route("**/api/v1/auth/bootstrap", (route) => route.fulfill({ status: 401, json: { code: "AUTHENTICATION_REQUIRED" } }));
   await page.goto("/");
   await expect(page).toHaveURL(/\/login$/);
-  await expect(page.getByRole("heading", { name: "Train with intent." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Train with intent. Measure what matters." })).toBeVisible();
 });
 
 test("401 after successful refresh retry signs out an already-rendered protected route", async ({ page }) => {

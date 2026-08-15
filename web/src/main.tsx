@@ -9,6 +9,7 @@ import {
   createBrowserRouter,
   Link,
   Navigate,
+  NavLink,
   Outlet,
   RouterProvider,
   useBlocker,
@@ -59,13 +60,16 @@ function Load({ children }: { children: React.ReactNode }) {
 function RouteError() {
   return (
     <Load>
-      <h1>Something went wrong</h1>
-      <p role="alert">
-        This page could not be loaded. Try again or return home.
-      </p>
-      <Link className="button secondary" to="/">
-        Return home
-      </Link>
+      <section className="state-page">
+        <p className="eyebrow">ERROR</p>
+        <h1>Something went wrong</h1>
+        <p role="alert">
+          This page could not be loaded. Try again or return home.
+        </p>
+        <Link className="button secondary" to="/">
+          Return home
+        </Link>
+      </section>
     </Load>
   );
 }
@@ -140,10 +144,31 @@ function Shell({ children }: { children: React.ReactNode }) {
       {children}
       {!transactional && (
         <nav className="bottom" aria-label="Primary">
-          <Link to="/">Home</Link>
-          <Link to="/routines">Routines</Link>
-          <Link to="/workouts">History</Link>
-          <Link to="/measurements">Evolution</Link>
+          <NavLink
+            className={({ isActive }) => (isActive ? "is-active" : "")}
+            end
+            to="/"
+          >
+            Home
+          </NavLink>
+          <NavLink
+            className={({ isActive }) => (isActive ? "is-active" : "")}
+            to="/routines"
+          >
+            Routines
+          </NavLink>
+          <NavLink
+            className={({ isActive }) => (isActive ? "is-active" : "")}
+            to="/workouts"
+          >
+            History
+          </NavLink>
+          <NavLink
+            className={({ isActive }) => (isActive ? "is-active" : "")}
+            to="/measurements"
+          >
+            Evolution
+          </NavLink>
         </nav>
       )}
     </>
@@ -157,35 +182,69 @@ function Login() {
     .filter(Boolean);
   return (
     <Load>
-      <section className="hero">
-        <p className="eyebrow">TRAINING LOG</p>
-        <h1>Train with intent.</h1>
-        <p>Sign in to keep your plans, sessions and measurements together.</p>
-        {error && (
-          <p className="error" role="alert">
-            {error}
-          </p>
-        )}
-        {providers.length ? (
-          providers.map((p: string) => (
-            <button
-              type="button"
-              className="primary full"
-              key={p}
-              onClick={() => {
-                if (!sessionStorage.getItem("returnTo"))
-                  sessionStorage.setItem("returnTo", location.pathname);
-                signIn(p as never).catch(() =>
-                  setError("Sign in could not be started."),
-                );
-              }}
-            >
-              Continue with {p}
-            </button>
-          ))
-        ) : (
-          <p className="error">Authentication is not configured.</p>
-        )}
+      <section className="login-page">
+        <div className="login-glow" aria-hidden="true" />
+        <div className="login-shell">
+          <div className="login-brand">
+            <span className="login-mark" aria-hidden="true">
+              w!
+            </span>
+            <span>work-ouch!</span>
+          </div>
+          <div className="login-hero">
+            <p className="eyebrow">TRAINING PERFORMANCE SYSTEM</p>
+            <h1>Train with intent. Measure what matters.</h1>
+            <p className="login-copy">
+              Sign in to keep routines, real sessions and body metrics in one
+              focused dark workspace.
+            </p>
+          </div>
+          <section className="login-panel" aria-label="Sign in">
+            <div className="login-stats" aria-hidden="true">
+              <div>
+                <span>PLAN</span>
+                <strong>01</strong>
+              </div>
+              <div>
+                <span>WORK</span>
+                <strong>02</strong>
+              </div>
+              <div>
+                <span>TRACK</span>
+                <strong>03</strong>
+              </div>
+            </div>
+            {error && (
+              <p className="error" role="alert">
+                {error}
+              </p>
+            )}
+            {providers.length ? (
+              providers.map((p: string) => (
+                <button
+                  type="button"
+                  className="primary login-action"
+                  key={p}
+                  onClick={() => {
+                    if (!sessionStorage.getItem("returnTo"))
+                      sessionStorage.setItem("returnTo", location.pathname);
+                    signIn(p as never).catch(() =>
+                      setError("Sign in could not be started."),
+                    );
+                  }}
+                >
+                  Continue with {p}
+                </button>
+              ))
+            ) : (
+              <p className="error">Authentication is not configured.</p>
+            )}
+            <p className="login-note">
+              Secure external sign-in. Your training data stays tied to your
+              account.
+            </p>
+          </section>
+        </div>
       </section>
     </Load>
   );
@@ -218,7 +277,11 @@ function Callback() {
   }, [nav]);
   return (
     <Load>
-      <p role="status">{message}</p>
+      <section className="state-page">
+        <p className="eyebrow">AUTHENTICATION</p>
+        <h1>Sign in</h1>
+        <p role="status">{message}</p>
+      </section>
     </Load>
   );
 }
@@ -232,40 +295,58 @@ function Home() {
   }, []);
   return (
     <Load>
-      <p className="eyebrow">TODAY</p>
-      <h1>Ready when you are.</h1>
-      <div className="grid">
-        <Card
-          to="/routines"
-          title="Routines"
-          text="Build or review a sealed plan."
-        />
-        <Card
-          to="/exercises"
-          title="Exercises"
-          text="Browse the active catalog."
-        />
-        <Card
-          to="/measurements"
-          title="Measurements"
-          text="Record your body metrics."
-        />
-      </div>
-      <section className="card">
-        <h2>In-progress workouts</h2>
-        {items === null ? (
-          <p>Loading…</p>
-        ) : items.length === 0 ? (
-          <p>No active sessions.</p>
-        ) : (
-          items.map((w) => (
-            <p key={w.id}>
-              <Link to={`/workouts/${w.id}/active`}>
-                Resume workout #{w.id}
-              </Link>
-            </p>
-          ))
-        )}
+      <section className="home-page">
+        <header className="home-header">
+          <p className="eyebrow">TODAY</p>
+          <h1>Ready when you are.</h1>
+          <p>
+            Pick up an active session or prepare the next block from your plan.
+          </p>
+        </header>
+        <div className="home-grid">
+          <Card
+            to="/routines"
+            title="Routines"
+            text="Build or review a sealed plan."
+            meta="PLAN"
+          />
+          <Card
+            to="/exercises"
+            title="Exercises"
+            text="Browse the active catalog."
+            meta="MOVE"
+          />
+          <Card
+            to="/measurements"
+            title="Measurements"
+            text="Record your body metrics."
+            meta="TRACK"
+          />
+        </div>
+        <section className="session-panel">
+          <div className="section-heading">
+            <p className="eyebrow">LIVE</p>
+            <h2>In-progress workouts</h2>
+          </div>
+          {items === null ? (
+            <p>Loading…</p>
+          ) : items.length === 0 ? (
+            <p className="empty">No active sessions.</p>
+          ) : (
+            <div className="session-list">
+              {items.map((w) => (
+                <Link
+                  className="session-link"
+                  key={w.id}
+                  to={`/workouts/${w.id}/active`}
+                >
+                  <span>Resume workout #{w.id}</span>
+                  <span aria-hidden="true">→</span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
       </section>
     </Load>
   );
@@ -274,13 +355,16 @@ function Card({
   to,
   title,
   text,
+  meta,
 }: {
   to: string;
   title: string;
   text: string;
+  meta?: string;
 }) {
   return (
-    <Link className="card link-card" to={to}>
+    <Link className="card link-card feature-card" to={to}>
+      {meta && <span className="feature-meta">{meta}</span>}
       <h2>{title}</h2>
       <p>{text}</p>
     </Link>
@@ -300,30 +384,50 @@ function Exercises() {
   }, []);
   return (
     <Load>
-      <h1>Exercises</h1>
-      {error && (
-        <p className="error" role="alert">
-          {error}
-        </p>
-      )}
-      {data === null ? (
-        <p>Loading…</p>
-      ) : data.length === 0 ? (
-        <p className="empty">No active exercises are available.</p>
-      ) : (
-        <div className="stack">
-          {data.map((e) => (
-            <Card
-              key={e.id}
-              to={`/exercises/${e.id}`}
-              title={e.name}
-              text={[e.movementPattern, e.equipment]
-                .filter(Boolean)
-                .join(" · ")}
-            />
-          ))}
-        </div>
-      )}
+      <section className="catalog-page">
+        <header className="catalog-header">
+          <div>
+            <p className="eyebrow">EXERCISE CATALOG</p>
+            <h1>Choose your weapon.</h1>
+          </div>
+          <p className="catalog-count">
+            <span className="sr-only">{data?.length ?? 0} exercises</span>
+            <span aria-hidden="true">{data?.length ?? 0}</span>
+          </p>
+        </header>
+        {error && (
+          <p className="error" role="alert">
+            {error}
+          </p>
+        )}
+        {data === null ? (
+          <p>Loading…</p>
+        ) : data.length === 0 ? (
+          <p className="empty">No active exercises are available.</p>
+        ) : (
+          <div className="catalog-grid">
+            {data.map((e, index) => (
+              <Link
+                className="catalog-card"
+                key={e.id}
+                to={`/exercises/${e.id}`}
+              >
+                <span className="catalog-number" aria-hidden="true">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <div>
+                  <h2>{e.name}</h2>
+                  <div className="catalog-meta">
+                    {e.movementPattern && <span>{e.movementPattern}</span>}
+                    {e.equipment && <span>{e.equipment}</span>}
+                  </div>
+                </div>
+                <p>{e.description || "Open technique and safety guidance."}</p>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
     </Load>
   );
 }
@@ -344,31 +448,49 @@ function ExerciseDetail() {
     );
   return (
     <Load>
-      <Link to="/exercises">← Exercises</Link>
-      <h1>{e.name}</h1>
-      {e.description && <p>{e.description}</p>}
-      {e.techniqueNotes && (
-        <section className="card">
-          <h2>Technique</h2>
-          <p>{e.techniqueNotes}</p>
-        </section>
-      )}
-      {e.safetyNotes && (
-        <section className="card">
-          <h2>Safety</h2>
-          <p>{e.safetyNotes}</p>
-        </section>
-      )}
-      {e.videoUrl && (
-        <a
-          className="button secondary"
-          href={e.videoUrl}
-          target="_blank"
-          rel="noreferrer"
-        >
-          Watch technique video
-        </a>
-      )}
+      <section className="detail-page">
+        <Link className="back-link" to="/exercises">
+          ← Exercises
+        </Link>
+        <header className="detail-header">
+          <div>
+            <p className="eyebrow">EXERCISE</p>
+            <h1>{e.name}</h1>
+          </div>
+          <div className="detail-badges">
+            {e.movementPattern && <span>{e.movementPattern}</span>}
+            {e.equipment && <span>{e.equipment}</span>}
+            {!e.isActive && <span>inactive</span>}
+          </div>
+        </header>
+        {e.description && <p className="detail-copy">{e.description}</p>}
+        <div className="detail-grid">
+          {e.techniqueNotes && (
+            <section className="info-card">
+              <p className="eyebrow">TECHNIQUE</p>
+              <h2>Technique</h2>
+              <p>{e.techniqueNotes}</p>
+            </section>
+          )}
+          {e.safetyNotes && (
+            <section className="info-card">
+              <p className="eyebrow">SAFETY</p>
+              <h2>Safety</h2>
+              <p>{e.safetyNotes}</p>
+            </section>
+          )}
+        </div>
+        {e.videoUrl && (
+          <a
+            className="button primary detail-action"
+            href={e.videoUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Watch technique video
+          </a>
+        )}
+      </section>
     </Load>
   );
 }
@@ -382,28 +504,46 @@ function Routines() {
   }, []);
   return (
     <Load>
-      <div className="title-row">
-        <h1>Routines</h1>
-        <Link className="button primary" to="/routines/new">
-          New routine
-        </Link>
-      </div>
-      {data === null ? (
-        <p>Loading…</p>
-      ) : data.length === 0 ? (
-        <p className="empty">No routines yet.</p>
-      ) : (
-        <div className="stack">
-          {data.map((r) => (
-            <Card
-              key={r.id}
-              to={`/routines/${r.id}`}
-              title={r.name}
-              text={`Routine #${r.id}`}
-            />
-          ))}
-        </div>
-      )}
+      <section className="catalog-page">
+        <header className="catalog-header">
+          <div>
+            <p className="eyebrow">TRAINING PLANS</p>
+            <h1>Build the next session.</h1>
+          </div>
+          <Link className="button primary catalog-cta" to="/routines/new">
+            New routine
+          </Link>
+        </header>
+        {data === null ? (
+          <p>Loading…</p>
+        ) : data.length === 0 ? (
+          <p className="empty">No routines yet.</p>
+        ) : (
+          <div className="catalog-grid">
+            {data.map((r) => (
+              <Link
+                className="catalog-card routine-card"
+                key={r.id}
+                to={`/routines/${r.id}`}
+              >
+                <span className="catalog-number" aria-hidden="true">
+                  {String(r.currentVersion.versionNumber).padStart(2, "0")}
+                </span>
+                <div>
+                  <h2>{r.name}</h2>
+                  <div className="catalog-meta">
+                    <span>version {r.currentVersion.versionNumber}</span>
+                    {r.currentVersion.name && (
+                      <span>{r.currentVersion.name}</span>
+                    )}
+                  </div>
+                </div>
+                <p>{r.description || "Open the current planned version."}</p>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
     </Load>
   );
 }
@@ -428,25 +568,49 @@ function RoutineDetailPage() {
   const v = r.version;
   return (
     <Load>
-      <h1>{r.name}</h1>
-      <p>Version {v?.versionNumber}</p>
-      {v?.exercises.map((x) => (
-        <section className="card" key={x.position}>
-          <h2>{x.exercise?.name || `Exercise ${x.exerciseId}`}</h2>
-          <p>
-            {x.sets.length} planned sets · rest {x.restSeconds ?? 0}s
-          </p>
-        </section>
-      ))}
-      <Link
-        className="button primary"
-        to={`/workouts/new?routineVersionId=${v?.id}`}
-      >
-        Start workout
-      </Link>
-      <Link className="button secondary" to={`/routines/${r.id}/versions/new`}>
-        New version
-      </Link>
+      <section className="detail-page">
+        <Link className="back-link" to="/routines">
+          ← Routines
+        </Link>
+        <header className="detail-header">
+          <div>
+            <p className="eyebrow">ROUTINE</p>
+            <h1>{r.name}</h1>
+          </div>
+          <div className="version-badge">
+            <span>VERSION</span>
+            <strong>{v?.versionNumber}</strong>
+          </div>
+        </header>
+        {r.description && <p className="detail-copy">{r.description}</p>}
+        <div className="detail-grid">
+          {v?.exercises.map((x) => (
+            <section className="info-card" key={x.position}>
+              <p className="eyebrow">POSITION {x.position}</p>
+              <h2>{x.exercise?.name || `Exercise ${x.exerciseId}`}</h2>
+              <div className="catalog-meta">
+                <span>{x.sets.length} planned sets</span>
+                <span>rest {x.restSeconds ?? 0}s</span>
+                {x.targetRpe && <span>RPE {x.targetRpe}</span>}
+              </div>
+            </section>
+          ))}
+        </div>
+        <div className="detail-actions">
+          <Link
+            className="button primary"
+            to={`/workouts/new?routineVersionId=${v?.id}`}
+          >
+            Start workout
+          </Link>
+          <Link
+            className="button secondary"
+            to={`/routines/${r.id}/versions/new`}
+          >
+            New version
+          </Link>
+        </div>
+      </section>
     </Load>
   );
 }
@@ -546,458 +710,469 @@ function RoutineEditor({
   };
   return (
     <Load>
-      <h1>{version ? "New routine version" : "New routine"}</h1>
-      {error && (
-        <p className="error" role="alert">
-          {error}
-        </p>
-      )}
-      <form onSubmit={submit}>
-        <label>
-          Version name
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            aria-describedby="routine-help"
-          />
-        </label>
-        <p id="routine-help">
-          Each exercise needs at least one planned repetition or duration set.
-        </p>
-        <button
-          type="button"
-          onClick={() => {
-            const exercise = catalog[0];
-            if (exercise)
-              setItems((old) => [
-                ...old,
-                {
-                  exerciseId: exercise.id,
-                  position: old.length + 1,
-                  restSeconds: null,
-                  targetRpe: null,
-                  notes: null,
-                  exercise,
-                  sets: [
-                    {
-                      setNumber: 1,
-                      setType: "work",
-                      targetWeightKg: null,
-                      targetRepsMin: 1,
-                      targetRepsMax: 1,
-                      targetSeconds: null,
-                      targetRpe: null,
-                      notes: null,
-                    },
-                  ],
-                },
-              ]);
-          }}
-        >
-          Add exercise
-        </button>
-        {items.map((item, index) => (
-          <fieldset className="card" key={item.position}>
-            <legend>Exercise {index + 1}</legend>
-            <button
-              type="button"
-              className="danger"
-              onClick={() =>
-                setItems((old) =>
-                  old
-                    .filter((_, i) => i !== index)
-                    .map((item, i) => ({ ...item, position: i + 1 })),
-                )
-              }
-            >
-              Remove exercise
-            </button>
-            <label>
-              Exercise
-              <select
-                value={item.exerciseId}
-                onChange={(e) =>
+      <section className="editor-page">
+        <header className="editor-header">
+          <p className="eyebrow">ROUTINE BUILDER</p>
+          <h1>{version ? "New routine version" : "New routine"}</h1>
+          <p>
+            Define a complete sealed version: exercises, positions, targets and
+            planned sets.
+          </p>
+        </header>
+        {error && (
+          <p className="error" role="alert">
+            {error}
+          </p>
+        )}
+        <form className="editor-form" onSubmit={submit}>
+          <label>
+            Version name
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              aria-describedby="routine-help"
+            />
+          </label>
+          <p id="routine-help">
+            Each exercise needs at least one planned repetition or duration set.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              const exercise = catalog[0];
+              if (exercise)
+                setItems((old) => [
+                  ...old,
+                  {
+                    exerciseId: exercise.id,
+                    position: old.length + 1,
+                    restSeconds: null,
+                    targetRpe: null,
+                    notes: null,
+                    exercise,
+                    sets: [
+                      {
+                        setNumber: 1,
+                        setType: "work",
+                        targetWeightKg: null,
+                        targetRepsMin: 1,
+                        targetRepsMax: 1,
+                        targetSeconds: null,
+                        targetRpe: null,
+                        notes: null,
+                      },
+                    ],
+                  },
+                ]);
+            }}
+          >
+            Add exercise
+          </button>
+          {items.map((item, index) => (
+            <fieldset className="card editor-exercise" key={item.position}>
+              <legend>Exercise {index + 1}</legend>
+              <button
+                type="button"
+                className="danger"
+                onClick={() =>
                   setItems((old) =>
-                    old.map((x, i) =>
-                      i === index
-                        ? {
-                            ...x,
-                            exerciseId: Number(e.target.value),
-                            exercise: catalog.find(
-                              (candidate) =>
-                                candidate.id === Number(e.target.value),
-                            ),
-                          }
-                        : x,
-                    ),
+                    old
+                      .filter((_, i) => i !== index)
+                      .map((item, i) => ({ ...item, position: i + 1 })),
                   )
                 }
               >
-                {catalog.map((exercise) => (
-                  <option key={exercise.id} value={exercise.id}>
-                    {exercise.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Position
-              <input
-                type="number"
-                min="1"
-                value={item.position}
-                onChange={(e) =>
-                  setItems((old) =>
-                    old.map((x, i) =>
-                      i === index
-                        ? { ...x, position: Number(e.target.value) }
-                        : x,
-                    ),
-                  )
-                }
-              />
-            </label>
-            <label>
-              Rest seconds
-              <input
-                type="number"
-                min="0"
-                value={item.restSeconds ?? ""}
-                onChange={(e) =>
-                  setItems((old) =>
-                    old.map((x, i) =>
-                      i === index
-                        ? {
-                            ...x,
-                            restSeconds: e.target.value
-                              ? Number(e.target.value)
-                              : null,
-                          }
-                        : x,
-                    ),
-                  )
-                }
-              />
-            </label>
-            <label>
-              Exercise target RPE
-              <input
-                type="number"
-                min="1"
-                max="10"
-                step="any"
-                value={item.targetRpe ?? ""}
-                onChange={(e) =>
-                  setItems((old) =>
-                    old.map((x, i) =>
-                      i === index
-                        ? {
-                            ...x,
-                            targetRpe: e.target.value
-                              ? Number(e.target.value)
-                              : null,
-                          }
-                        : x,
-                    ),
-                  )
-                }
-              />
-            </label>
-            <label>
-              Exercise notes
-              <textarea
-                value={item.notes ?? ""}
-                onChange={(e) =>
-                  setItems((old) =>
-                    old.map((x, i) =>
-                      i === index ? { ...x, notes: e.target.value || null } : x,
-                    ),
-                  )
-                }
-              />
-            </label>
-            {item.sets.map((set, setIndex) => (
-              <div className="set-row" key={set.setNumber}>
-                <label>
-                  Set number
-                  <input
-                    aria-label={`Set ${set.setNumber} number`}
-                    type="number"
-                    min="1"
-                    value={set.setNumber}
-                    onChange={(e) =>
-                      setItems((old) =>
-                        old.map((x, i) =>
-                          i === index
-                            ? {
-                                ...x,
-                                sets: x.sets.map((s, si) =>
-                                  si === setIndex
-                                    ? {
-                                        ...s,
-                                        setNumber: Number(e.target.value),
-                                      }
-                                    : s,
-                                ),
-                              }
-                            : x,
-                        ),
-                      )
-                    }
-                  />
-                </label>
-                <label>
-                  Set type
-                  <select
-                    value={set.setType ?? "work"}
-                    onChange={(e) =>
-                      setItems((old) =>
-                        old.map((x, i) =>
-                          i === index
-                            ? {
-                                ...x,
-                                sets: x.sets.map((s, si) =>
-                                  si === setIndex
-                                    ? { ...s, setType: e.target.value }
-                                    : s,
-                                ),
-                              }
-                            : x,
-                        ),
-                      )
-                    }
-                  >
-                    <option value="warmup">Warmup</option>
-                    <option value="work">Work</option>
-                    <option value="backoff">Backoff</option>
-                  </select>
-                </label>
-                <label>
-                  Target weight kg
-                  <input
-                    type="number"
-                    min="0"
-                    step="any"
-                    value={set.targetWeightKg ?? ""}
-                    onChange={(e) =>
-                      setItems((old) =>
-                        old.map((x, i) =>
-                          i === index
-                            ? {
-                                ...x,
-                                sets: x.sets.map((s, si) =>
-                                  si === setIndex
-                                    ? {
-                                        ...s,
-                                        targetWeightKg: e.target.value
-                                          ? Number(e.target.value)
-                                          : null,
-                                      }
-                                    : s,
-                                ),
-                              }
-                            : x,
-                        ),
-                      )
-                    }
-                  />
-                </label>
-                <label>
-                  Minimum reps
-                  <input
-                    type="number"
-                    min="1"
-                    value={set.targetRepsMin ?? ""}
-                    onChange={(e) =>
-                      setItems((old) =>
-                        old.map((x, i) =>
-                          i === index
-                            ? {
-                                ...x,
-                                sets: x.sets.map((s, si) =>
-                                  si === setIndex
-                                    ? {
-                                        ...s,
-                                        targetRepsMin: e.target.value
-                                          ? Number(e.target.value)
-                                          : null,
-                                      }
-                                    : s,
-                                ),
-                              }
-                            : x,
-                        ),
-                      )
-                    }
-                  />
-                </label>
-                <label>
-                  Maximum reps
-                  <input
-                    type="number"
-                    min="1"
-                    value={set.targetRepsMax ?? ""}
-                    onChange={(e) =>
-                      setItems((old) =>
-                        old.map((x, i) =>
-                          i === index
-                            ? {
-                                ...x,
-                                sets: x.sets.map((s, si) =>
-                                  si === setIndex
-                                    ? {
-                                        ...s,
-                                        targetRepsMax: e.target.value
-                                          ? Number(e.target.value)
-                                          : null,
-                                      }
-                                    : s,
-                                ),
-                              }
-                            : x,
-                        ),
-                      )
-                    }
-                  />
-                </label>
-                <label>
-                  Target duration seconds
-                  <input
-                    type="number"
-                    min="0"
-                    value={set.targetSeconds ?? ""}
-                    onChange={(e) =>
-                      setItems((old) =>
-                        old.map((x, i) =>
-                          i === index
-                            ? {
-                                ...x,
-                                sets: x.sets.map((s, si) =>
-                                  si === setIndex
-                                    ? {
-                                        ...s,
-                                        targetSeconds: e.target.value
-                                          ? Number(e.target.value)
-                                          : null,
-                                      }
-                                    : s,
-                                ),
-                              }
-                            : x,
-                        ),
-                      )
-                    }
-                  />
-                </label>
-                <label>
-                  Set target RPE
-                  <input
-                    type="number"
-                    min="1"
-                    max="10"
-                    step="any"
-                    value={set.targetRpe ?? ""}
-                    onChange={(e) =>
-                      setItems((old) =>
-                        old.map((x, i) =>
-                          i === index
-                            ? {
-                                ...x,
-                                sets: x.sets.map((s, si) =>
-                                  si === setIndex
-                                    ? {
-                                        ...s,
-                                        targetRpe: e.target.value
-                                          ? Number(e.target.value)
-                                          : null,
-                                      }
-                                    : s,
-                                ),
-                              }
-                            : x,
-                        ),
-                      )
-                    }
-                  />
-                </label>
-                <label>
-                  Set notes
-                  <input
-                    value={set.notes ?? ""}
-                    onChange={(e) =>
-                      setItems((old) =>
-                        old.map((x, i) =>
-                          i === index
-                            ? {
-                                ...x,
-                                sets: x.sets.map((s, si) =>
-                                  si === setIndex
-                                    ? { ...s, notes: e.target.value || null }
-                                    : s,
-                                ),
-                              }
-                            : x,
-                        ),
-                      )
-                    }
-                  />
-                </label>
-                <button
-                  type="button"
-                  className="danger"
-                  onClick={() =>
+                Remove exercise
+              </button>
+              <label>
+                Exercise
+                <select
+                  value={item.exerciseId}
+                  onChange={(e) =>
                     setItems((old) =>
                       old.map((x, i) =>
                         i === index
                           ? {
                               ...x,
-                              sets: x.sets.filter((_, si) => si !== setIndex),
+                              exerciseId: Number(e.target.value),
+                              exercise: catalog.find(
+                                (candidate) =>
+                                  candidate.id === Number(e.target.value),
+                              ),
                             }
                           : x,
                       ),
                     )
                   }
                 >
-                  Remove set
-                </button>
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={() =>
-                setItems((old) =>
-                  old.map((x, i) =>
-                    i === index
-                      ? {
-                          ...x,
-                          sets: [
-                            ...x.sets,
-                            {
-                              setNumber: x.sets.length + 1,
-                              setType: "work",
-                              targetWeightKg: null,
-                              targetRepsMin: 1,
-                              targetRepsMax: 1,
-                              targetSeconds: null,
-                              targetRpe: null,
-                              notes: null,
-                            },
-                          ],
-                        }
-                      : x,
-                  ),
-                )
-              }
-            >
-              Add set
-            </button>
-          </fieldset>
-        ))}
-        <button type="submit" className="primary">
-          Save complete definition
-        </button>
-      </form>
+                  {catalog.map((exercise) => (
+                    <option key={exercise.id} value={exercise.id}>
+                      {exercise.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Position
+                <input
+                  type="number"
+                  min="1"
+                  value={item.position}
+                  onChange={(e) =>
+                    setItems((old) =>
+                      old.map((x, i) =>
+                        i === index
+                          ? { ...x, position: Number(e.target.value) }
+                          : x,
+                      ),
+                    )
+                  }
+                />
+              </label>
+              <label>
+                Rest seconds
+                <input
+                  type="number"
+                  min="0"
+                  value={item.restSeconds ?? ""}
+                  onChange={(e) =>
+                    setItems((old) =>
+                      old.map((x, i) =>
+                        i === index
+                          ? {
+                              ...x,
+                              restSeconds: e.target.value
+                                ? Number(e.target.value)
+                                : null,
+                            }
+                          : x,
+                      ),
+                    )
+                  }
+                />
+              </label>
+              <label>
+                Exercise target RPE
+                <input
+                  type="number"
+                  min="1"
+                  max="10"
+                  step="any"
+                  value={item.targetRpe ?? ""}
+                  onChange={(e) =>
+                    setItems((old) =>
+                      old.map((x, i) =>
+                        i === index
+                          ? {
+                              ...x,
+                              targetRpe: e.target.value
+                                ? Number(e.target.value)
+                                : null,
+                            }
+                          : x,
+                      ),
+                    )
+                  }
+                />
+              </label>
+              <label>
+                Exercise notes
+                <textarea
+                  value={item.notes ?? ""}
+                  onChange={(e) =>
+                    setItems((old) =>
+                      old.map((x, i) =>
+                        i === index
+                          ? { ...x, notes: e.target.value || null }
+                          : x,
+                      ),
+                    )
+                  }
+                />
+              </label>
+              {item.sets.map((set, setIndex) => (
+                <div className="set-row" key={set.setNumber}>
+                  <label>
+                    Set number
+                    <input
+                      aria-label={`Set ${set.setNumber} number`}
+                      type="number"
+                      min="1"
+                      value={set.setNumber}
+                      onChange={(e) =>
+                        setItems((old) =>
+                          old.map((x, i) =>
+                            i === index
+                              ? {
+                                  ...x,
+                                  sets: x.sets.map((s, si) =>
+                                    si === setIndex
+                                      ? {
+                                          ...s,
+                                          setNumber: Number(e.target.value),
+                                        }
+                                      : s,
+                                  ),
+                                }
+                              : x,
+                          ),
+                        )
+                      }
+                    />
+                  </label>
+                  <label>
+                    Set type
+                    <select
+                      value={set.setType ?? "work"}
+                      onChange={(e) =>
+                        setItems((old) =>
+                          old.map((x, i) =>
+                            i === index
+                              ? {
+                                  ...x,
+                                  sets: x.sets.map((s, si) =>
+                                    si === setIndex
+                                      ? { ...s, setType: e.target.value }
+                                      : s,
+                                  ),
+                                }
+                              : x,
+                          ),
+                        )
+                      }
+                    >
+                      <option value="warmup">Warmup</option>
+                      <option value="work">Work</option>
+                      <option value="backoff">Backoff</option>
+                    </select>
+                  </label>
+                  <label>
+                    Target weight kg
+                    <input
+                      type="number"
+                      min="0"
+                      step="any"
+                      value={set.targetWeightKg ?? ""}
+                      onChange={(e) =>
+                        setItems((old) =>
+                          old.map((x, i) =>
+                            i === index
+                              ? {
+                                  ...x,
+                                  sets: x.sets.map((s, si) =>
+                                    si === setIndex
+                                      ? {
+                                          ...s,
+                                          targetWeightKg: e.target.value
+                                            ? Number(e.target.value)
+                                            : null,
+                                        }
+                                      : s,
+                                  ),
+                                }
+                              : x,
+                          ),
+                        )
+                      }
+                    />
+                  </label>
+                  <label>
+                    Minimum reps
+                    <input
+                      type="number"
+                      min="1"
+                      value={set.targetRepsMin ?? ""}
+                      onChange={(e) =>
+                        setItems((old) =>
+                          old.map((x, i) =>
+                            i === index
+                              ? {
+                                  ...x,
+                                  sets: x.sets.map((s, si) =>
+                                    si === setIndex
+                                      ? {
+                                          ...s,
+                                          targetRepsMin: e.target.value
+                                            ? Number(e.target.value)
+                                            : null,
+                                        }
+                                      : s,
+                                  ),
+                                }
+                              : x,
+                          ),
+                        )
+                      }
+                    />
+                  </label>
+                  <label>
+                    Maximum reps
+                    <input
+                      type="number"
+                      min="1"
+                      value={set.targetRepsMax ?? ""}
+                      onChange={(e) =>
+                        setItems((old) =>
+                          old.map((x, i) =>
+                            i === index
+                              ? {
+                                  ...x,
+                                  sets: x.sets.map((s, si) =>
+                                    si === setIndex
+                                      ? {
+                                          ...s,
+                                          targetRepsMax: e.target.value
+                                            ? Number(e.target.value)
+                                            : null,
+                                        }
+                                      : s,
+                                  ),
+                                }
+                              : x,
+                          ),
+                        )
+                      }
+                    />
+                  </label>
+                  <label>
+                    Target duration seconds
+                    <input
+                      type="number"
+                      min="0"
+                      value={set.targetSeconds ?? ""}
+                      onChange={(e) =>
+                        setItems((old) =>
+                          old.map((x, i) =>
+                            i === index
+                              ? {
+                                  ...x,
+                                  sets: x.sets.map((s, si) =>
+                                    si === setIndex
+                                      ? {
+                                          ...s,
+                                          targetSeconds: e.target.value
+                                            ? Number(e.target.value)
+                                            : null,
+                                        }
+                                      : s,
+                                  ),
+                                }
+                              : x,
+                          ),
+                        )
+                      }
+                    />
+                  </label>
+                  <label>
+                    Set target RPE
+                    <input
+                      type="number"
+                      min="1"
+                      max="10"
+                      step="any"
+                      value={set.targetRpe ?? ""}
+                      onChange={(e) =>
+                        setItems((old) =>
+                          old.map((x, i) =>
+                            i === index
+                              ? {
+                                  ...x,
+                                  sets: x.sets.map((s, si) =>
+                                    si === setIndex
+                                      ? {
+                                          ...s,
+                                          targetRpe: e.target.value
+                                            ? Number(e.target.value)
+                                            : null,
+                                        }
+                                      : s,
+                                  ),
+                                }
+                              : x,
+                          ),
+                        )
+                      }
+                    />
+                  </label>
+                  <label>
+                    Set notes
+                    <input
+                      value={set.notes ?? ""}
+                      onChange={(e) =>
+                        setItems((old) =>
+                          old.map((x, i) =>
+                            i === index
+                              ? {
+                                  ...x,
+                                  sets: x.sets.map((s, si) =>
+                                    si === setIndex
+                                      ? { ...s, notes: e.target.value || null }
+                                      : s,
+                                  ),
+                                }
+                              : x,
+                          ),
+                        )
+                      }
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    className="danger"
+                    onClick={() =>
+                      setItems((old) =>
+                        old.map((x, i) =>
+                          i === index
+                            ? {
+                                ...x,
+                                sets: x.sets.filter((_, si) => si !== setIndex),
+                              }
+                            : x,
+                        ),
+                      )
+                    }
+                  >
+                    Remove set
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() =>
+                  setItems((old) =>
+                    old.map((x, i) =>
+                      i === index
+                        ? {
+                            ...x,
+                            sets: [
+                              ...x.sets,
+                              {
+                                setNumber: x.sets.length + 1,
+                                setType: "work",
+                                targetWeightKg: null,
+                                targetRepsMin: 1,
+                                targetRepsMax: 1,
+                                targetSeconds: null,
+                                targetRpe: null,
+                                notes: null,
+                              },
+                            ],
+                          }
+                        : x,
+                    ),
+                  )
+                }
+              >
+                Add set
+              </button>
+            </fieldset>
+          ))}
+          <button type="submit" className="primary form-submit">
+            Save complete definition
+          </button>
+        </form>
+      </section>
     </Load>
   );
 }
@@ -1040,8 +1215,11 @@ function StartWorkout() {
   }, [nav, query]);
   return (
     <Load>
-      <h1>Start workout</h1>
-      <p role="status">{error || "Starting workout…"}</p>
+      <section className="state-page">
+        <p className="eyebrow">WORKOUT</p>
+        <h1>Start workout</h1>
+        <p role="status">{error || "Starting workout…"}</p>
+      </section>
     </Load>
   );
 }
@@ -1094,43 +1272,52 @@ function MeasurementEditor() {
   }
   return (
     <Load>
-      <h1>New measurement</h1>
-      {error && (
-        <p className="error" role="alert">
-          {error}
-        </p>
-      )}
-      <form onSubmit={submit}>
-        <label>
-          Date and time
-          <input
-            type="datetime-local"
-            value={measuredAt}
-            onChange={(e) => setMeasuredAt(e.target.value)}
-            required
-            aria-describedby="measurement-time-help"
-          />
-        </label>
-        <p id="measurement-time-help">
-          Your local time is converted to a UTC timestamp.
-        </p>
-        {metrics.map((metric) => (
-          <label key={metric.code}>
-            {metric.name} ({metric.unit || "value"})
+      <section className="editor-page measurement-editor">
+        <header className="editor-header">
+          <p className="eyebrow">BODY TRACKING</p>
+          <h1>New measurement</h1>
+          <p>Capture one immutable snapshot with one or more metric values.</p>
+        </header>
+        {error && (
+          <p className="error" role="alert">
+            {error}
+          </p>
+        )}
+        <form className="editor-form" onSubmit={submit}>
+          <label>
+            Date and time
             <input
-              type="number"
-              step="any"
-              value={values[metric.code] ?? ""}
-              onChange={(e) =>
-                setValues((old) => ({ ...old, [metric.code]: e.target.value }))
-              }
+              type="datetime-local"
+              value={measuredAt}
+              onChange={(e) => setMeasuredAt(e.target.value)}
+              required
+              aria-describedby="measurement-time-help"
             />
           </label>
-        ))}
-        <button type="submit" className="primary">
-          Save measurement
-        </button>
-      </form>
+          <p id="measurement-time-help">
+            Your local time is converted to a UTC timestamp.
+          </p>
+          {metrics.map((metric) => (
+            <label key={metric.code}>
+              {metric.name} ({metric.unit || "value"})
+              <input
+                type="number"
+                step="any"
+                value={values[metric.code] ?? ""}
+                onChange={(e) =>
+                  setValues((old) => ({
+                    ...old,
+                    [metric.code]: e.target.value,
+                  }))
+                }
+              />
+            </label>
+          ))}
+          <button type="submit" className="primary form-submit">
+            Save measurement
+          </button>
+        </form>
+      </section>
     </Load>
   );
 }
@@ -1270,40 +1457,60 @@ function Workouts() {
   }, [status]);
   return (
     <Load>
-      <h1>Workout history</h1>
-      <label>
-        Status
-        <select
-          value={status}
-          onChange={(event) => setStatus(event.target.value as typeof status)}
-        >
-          <option value="all">All</option>
-          <option value="in_progress">In progress</option>
-          <option value="completed">Completed</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
-      </label>
-      {error && (
-        <p className="error" role="alert">
-          {error}
-        </p>
-      )}
-      {data === null ? (
-        <p>Loading…</p>
-      ) : data.length === 0 ? (
-        <p className="empty">No workouts yet.</p>
-      ) : (
-        <div className="stack">
-          {data.map((w) => (
-            <Card
-              key={w.id}
-              to={`/workouts/${w.id}`}
-              title={`Workout #${w.id}`}
-              text={w.status}
-            />
-          ))}
-        </div>
-      )}
+      <section className="catalog-page">
+        <header className="catalog-header">
+          <div>
+            <p className="eyebrow">TRAINING LOG</p>
+            <h1>Workout history</h1>
+          </div>
+          <label className="filter-control">
+            Status
+            <select
+              value={status}
+              onChange={(event) =>
+                setStatus(event.target.value as typeof status)
+              }
+            >
+              <option value="all">All</option>
+              <option value="in_progress">In progress</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </label>
+        </header>
+        {error && (
+          <p className="error" role="alert">
+            {error}
+          </p>
+        )}
+        {data === null ? (
+          <p>Loading…</p>
+        ) : data.length === 0 ? (
+          <p className="empty">No workouts yet.</p>
+        ) : (
+          <div className="catalog-grid">
+            {data.map((w) => (
+              <Link
+                className="catalog-card workout-card"
+                key={w.id}
+                to={`/workouts/${w.id}`}
+              >
+                <span className={`status-pill status-${w.status}`}>
+                  {w.status.replace("_", " ")}
+                </span>
+                <div>
+                  <h2>Workout #{w.id}</h2>
+                  <div className="catalog-meta">
+                    <span>{new Date(w.startedAt).toLocaleDateString()}</span>
+                    {w.planning?.name && <span>{w.planning.name}</span>}
+                  </div>
+                </div>
+                <p>Open the planned and recorded session.</p>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
     </Load>
   );
 }
@@ -1324,31 +1531,64 @@ function WorkoutDetail() {
     );
   return (
     <Load>
-      <h1>Workout #{w.id}</h1>
-      <p>Status: {w.status}</p>
-      {w.planning && (
-        <section className="card">
-          <h2>{w.planning.name}</h2>
-          <p>Version {w.planning.version.versionNumber}</p>
-          {w.planning.version.exercises.map((exercise) => (
-            <p key={exercise.id}>
-              Planned: {exercise.exercise?.name || exercise.exerciseId}
-            </p>
-          ))}
-        </section>
-      )}
-      {w.status === "in_progress" && (
-        <Link className="button primary" to="active">
-          Resume
+      <section className="detail-page">
+        <Link className="back-link" to="/workouts">
+          ← History
         </Link>
-      )}
-      <h2>Results</h2>
-      {w.results?.map((r) => (
-        <section className="card" key={r.routineExerciseId}>
-          <h3>Planned exercise #{r.routineExerciseId}</h3>
-          <p>{r.sets.length} sets recorded</p>
+        <header className="detail-header">
+          <div>
+            <p className="eyebrow">WORKOUT</p>
+            <h1>Workout #{w.id}</h1>
+          </div>
+          <span className={`status-pill status-${w.status}`}>
+            Status: {w.status}
+          </span>
+        </header>
+        {w.status === "in_progress" && (
+          <Link className="button primary detail-action" to="active">
+            Resume
+          </Link>
+        )}
+        {w.planning && (
+          <section className="info-card">
+            <p className="eyebrow">PLANNING</p>
+            <h2>{w.planning.name}</h2>
+            <div className="catalog-meta">
+              <span>Version {w.planning.version.versionNumber}</span>
+              <span>
+                {w.planning.version.exercises.length} planned exercises
+              </span>
+            </div>
+            <div className="mini-list">
+              {w.planning.version.exercises.map((exercise) => (
+                <p key={exercise.id}>
+                  Planned: {exercise.exercise?.name || exercise.exerciseId}
+                </p>
+              ))}
+            </div>
+          </section>
+        )}
+        <section className="results-section">
+          <div className="section-heading">
+            <p className="eyebrow">EXECUTION</p>
+            <h2>Results</h2>
+          </div>
+          {w.results?.length ? (
+            <div className="detail-grid">
+              {w.results.map((r) => (
+                <section className="info-card" key={r.routineExerciseId}>
+                  <p className="eyebrow">PLANNED #{r.routineExerciseId}</p>
+                  <h3>Performed exercise #{r.exerciseId}</h3>
+                  <p>{r.sets.length} sets recorded</p>
+                  {r.notes && <p>{r.notes}</p>}
+                </section>
+              ))}
+            </div>
+          ) : (
+            <p className="empty">No results recorded.</p>
+          )}
         </section>
-      ))}
+      </section>
     </Load>
   );
 }
@@ -1679,323 +1919,359 @@ function WorkoutEditor() {
   };
   return (
     <Load>
-      <p className="eyebrow">ACTIVE WORKOUT</p>
-      <Link to="/workouts">Exit workout</Link>
-      <h1>{workout.planning?.name || `Session #${workout.id}`}</h1>
-      <p>
-        Exercise {selected + 1} of {exercises.length}
-      </p>
-      {error && (
-        <p className="state" role="status">
-          {error}
-        </p>
-      )}
-      <section className="card">
-        <h2>{planned.exercise?.name || `Exercise ${planned.exerciseId}`}</h2>
-        <label>
-          Performed exercise
-          <select
-            value={draft.exerciseId}
-            onChange={(e) =>
-              update({ ...draft, exerciseId: Number(e.target.value) })
-            }
-          >
-            {catalog.map((exercise) => (
-              <option key={exercise.id} value={exercise.id}>
-                {exercise.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        {draft.sets.map((set, index) => (
-          <fieldset className="set-row" key={set.setNumber}>
-            <legend>Set {set.setNumber}</legend>
-            <label>
-              Weight kg
-              <input
-                type="number"
-                min="0"
-                step="any"
-                value={set.weightKg ?? ""}
-                onChange={(e) =>
-                  update({
-                    ...draft,
-                    sets: draft.sets.map((x, i) =>
-                      i === index
-                        ? {
-                            ...x,
-                            weightKg:
-                              e.target.value === ""
-                                ? null
-                                : Number(e.target.value),
-                          }
-                        : x,
-                    ),
-                  })
-                }
-              />
-            </label>
-            <label>
-              Reps
-              <input
-                type="number"
-                min="0"
-                value={set.reps ?? ""}
-                onChange={(e) =>
-                  update({
-                    ...draft,
-                    sets: draft.sets.map((x, i) =>
-                      i === index
-                        ? {
-                            ...x,
-                            reps:
-                              e.target.value === ""
-                                ? null
-                                : Number(e.target.value),
-                          }
-                        : x,
-                    ),
-                  })
-                }
-              />
-            </label>
-            <label>
-              RPE
-              <input
-                type="number"
-                min="1"
-                max="10"
-                step="any"
-                value={set.rpe ?? ""}
-                onChange={(e) =>
-                  update({
-                    ...draft,
-                    sets: draft.sets.map((x, i) =>
-                      i === index
-                        ? {
-                            ...x,
-                            rpe:
-                              e.target.value === ""
-                                ? null
-                                : Number(e.target.value),
-                          }
-                        : x,
-                    ),
-                  })
-                }
-              />
-            </label>
-            <label>
-              Duration seconds
-              <input
-                type="number"
-                min="0"
-                value={set.durationSeconds ?? ""}
-                onChange={(e) =>
-                  update({
-                    ...draft,
-                    sets: draft.sets.map((x, i) =>
-                      i === index
-                        ? {
-                            ...x,
-                            durationSeconds:
-                              e.target.value === ""
-                                ? null
-                                : Number(e.target.value),
-                          }
-                        : x,
-                    ),
-                  })
-                }
-              />
-            </label>
-            <label>
-              Pain level (0–10)
-              <input
-                type="number"
-                min="0"
-                max="10"
-                value={set.painLevel ?? ""}
-                onChange={(e) =>
-                  update({
-                    ...draft,
-                    sets: draft.sets.map((x, i) =>
-                      i === index
-                        ? {
-                            ...x,
-                            painLevel:
-                              e.target.value === ""
-                                ? null
-                                : Number(e.target.value),
-                          }
-                        : x,
-                    ),
-                  })
-                }
-              />
-            </label>
-            <label>
-              Pain area
-              <input
-                value={set.painArea ?? ""}
-                onChange={(e) =>
-                  update({
-                    ...draft,
-                    sets: draft.sets.map((x, i) =>
-                      i === index
-                        ? { ...x, painArea: e.target.value || null }
-                        : x,
-                    ),
-                  })
-                }
-              />
-            </label>
-            <label>
-              Notes
-              <input
-                value={set.notes ?? ""}
-                onChange={(e) =>
-                  update({
-                    ...draft,
-                    sets: draft.sets.map((x, i) =>
-                      i === index ? { ...x, notes: e.target.value || null } : x,
-                    ),
-                  })
-                }
-              />
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={set.completed}
-                onChange={(e) =>
-                  update({
-                    ...draft,
-                    sets: draft.sets.map((x, i) =>
-                      i === index ? { ...x, completed: e.target.checked } : x,
-                    ),
-                  })
-                }
-              />{" "}
-              Completed
-            </label>
+      <section className="workout-page">
+        <header className="workout-header">
+          <div>
+            <p className="eyebrow">ACTIVE WORKOUT</p>
+            <h1>{workout.planning?.name || `Session #${workout.id}`}</h1>
+          </div>
+          <Link className="button secondary" to="/workouts">
+            Exit workout
+          </Link>
+        </header>
+        <div className="workout-progress">
+          <span>
+            Exercise {selected + 1} of {exercises.length}
+          </span>
+          <div aria-hidden="true">
+            <span
+              style={{
+                width: `${((selected + 1) / exercises.length) * 100}%`,
+              }}
+            />
+          </div>
+        </div>
+        <fieldset className="exercise-tabs">
+          <legend className="sr-only">Planned exercises</legend>
+          {exercises.map((exercise, index) => (
             <button
+              className={index === selected ? "is-active" : ""}
+              key={exercise.id}
               type="button"
-              className="danger"
-              onClick={() => update(removeSet(draft, set.setNumber))}
+              onClick={(event) => requestSelection(index, event)}
             >
-              Remove set
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              {exercise.exercise?.name || `Exercise ${exercise.exerciseId}`}
             </button>
-          </fieldset>
-        ))}
-        <button type="button" onClick={() => update(addSet(draft))}>
-          Add set
-        </button>
-        <label>
-          Exercise notes
-          <textarea
-            value={draft.notes ?? ""}
-            onChange={(e) =>
-              update({ ...draft, notes: e.target.value || null })
+          ))}
+        </fieldset>
+        {error && (
+          <p className="state" role="status">
+            {error}
+          </p>
+        )}
+        <section className="card active-exercise-card">
+          <h2>{planned.exercise?.name || `Exercise ${planned.exerciseId}`}</h2>
+          <label>
+            Performed exercise
+            <select
+              value={draft.exerciseId}
+              onChange={(e) =>
+                update({ ...draft, exerciseId: Number(e.target.value) })
+              }
+            >
+              {catalog.map((exercise) => (
+                <option key={exercise.id} value={exercise.id}>
+                  {exercise.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          {draft.sets.map((set, index) => (
+            <fieldset
+              className={`set-row ${set.completed ? "is-complete" : ""}`}
+              key={set.setNumber}
+            >
+              <legend>Set {set.setNumber}</legend>
+              <label>
+                Weight kg
+                <input
+                  type="number"
+                  min="0"
+                  step="any"
+                  value={set.weightKg ?? ""}
+                  onChange={(e) =>
+                    update({
+                      ...draft,
+                      sets: draft.sets.map((x, i) =>
+                        i === index
+                          ? {
+                              ...x,
+                              weightKg:
+                                e.target.value === ""
+                                  ? null
+                                  : Number(e.target.value),
+                            }
+                          : x,
+                      ),
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Reps
+                <input
+                  type="number"
+                  min="0"
+                  value={set.reps ?? ""}
+                  onChange={(e) =>
+                    update({
+                      ...draft,
+                      sets: draft.sets.map((x, i) =>
+                        i === index
+                          ? {
+                              ...x,
+                              reps:
+                                e.target.value === ""
+                                  ? null
+                                  : Number(e.target.value),
+                            }
+                          : x,
+                      ),
+                    })
+                  }
+                />
+              </label>
+              <label>
+                RPE
+                <input
+                  type="number"
+                  min="1"
+                  max="10"
+                  step="any"
+                  value={set.rpe ?? ""}
+                  onChange={(e) =>
+                    update({
+                      ...draft,
+                      sets: draft.sets.map((x, i) =>
+                        i === index
+                          ? {
+                              ...x,
+                              rpe:
+                                e.target.value === ""
+                                  ? null
+                                  : Number(e.target.value),
+                            }
+                          : x,
+                      ),
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Duration seconds
+                <input
+                  type="number"
+                  min="0"
+                  value={set.durationSeconds ?? ""}
+                  onChange={(e) =>
+                    update({
+                      ...draft,
+                      sets: draft.sets.map((x, i) =>
+                        i === index
+                          ? {
+                              ...x,
+                              durationSeconds:
+                                e.target.value === ""
+                                  ? null
+                                  : Number(e.target.value),
+                            }
+                          : x,
+                      ),
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Pain level (0–10)
+                <input
+                  type="number"
+                  min="0"
+                  max="10"
+                  value={set.painLevel ?? ""}
+                  onChange={(e) =>
+                    update({
+                      ...draft,
+                      sets: draft.sets.map((x, i) =>
+                        i === index
+                          ? {
+                              ...x,
+                              painLevel:
+                                e.target.value === ""
+                                  ? null
+                                  : Number(e.target.value),
+                            }
+                          : x,
+                      ),
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Pain area
+                <input
+                  value={set.painArea ?? ""}
+                  onChange={(e) =>
+                    update({
+                      ...draft,
+                      sets: draft.sets.map((x, i) =>
+                        i === index
+                          ? { ...x, painArea: e.target.value || null }
+                          : x,
+                      ),
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Notes
+                <input
+                  value={set.notes ?? ""}
+                  onChange={(e) =>
+                    update({
+                      ...draft,
+                      sets: draft.sets.map((x, i) =>
+                        i === index
+                          ? { ...x, notes: e.target.value || null }
+                          : x,
+                      ),
+                    })
+                  }
+                />
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={set.completed}
+                  onChange={(e) =>
+                    update({
+                      ...draft,
+                      sets: draft.sets.map((x, i) =>
+                        i === index ? { ...x, completed: e.target.checked } : x,
+                      ),
+                    })
+                  }
+                />{" "}
+                Completed
+              </label>
+              <button
+                type="button"
+                className="danger"
+                onClick={() => update(removeSet(draft, set.setNumber))}
+              >
+                Remove set
+              </button>
+            </fieldset>
+          ))}
+          <button type="button" onClick={() => update(addSet(draft))}>
+            Add set
+          </button>
+          <label>
+            Exercise notes
+            <textarea
+              value={draft.notes ?? ""}
+              onChange={(e) =>
+                update({ ...draft, notes: e.target.value || null })
+              }
+            />
+          </label>
+        </section>
+        <div className="actions workout-actions">
+          <button type="button" className="primary" onClick={save}>
+            Save complete result
+          </button>
+          <button type="button" onClick={() => setTimer(60)}>
+            {timer ? `Rest ${timer}s` : "Start rest timer"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setPaused((value) => !value)}
+            disabled={!timer}
+          >
+            {paused ? "Resume timer" : "Pause timer"}
+          </button>
+        </div>
+        <div className="actions workout-actions terminal-actions">
+          <button
+            type="button"
+            onClick={(event) => requestSelection(selected - 1, event)}
+          >
+            Previous exercise
+          </button>
+          <button
+            type="button"
+            onClick={(event) => requestSelection(selected + 1, event)}
+          >
+            Next exercise
+          </button>
+          <button
+            type="button"
+            className="primary"
+            onClick={(event) => {
+              triggerRef.current = event.currentTarget;
+              setDialog("complete");
+            }}
+          >
+            Complete workout
+          </button>
+          <button
+            type="button"
+            className="danger"
+            onClick={(event) => {
+              triggerRef.current = event.currentTarget;
+              setDialog("cancel");
+            }}
+          >
+            Cancel workout
+          </button>
+        </div>
+        {dialog && (
+          <ConfirmDialog
+            title={
+              dialog === "cancel"
+                ? "Cancel workout?"
+                : dialog === "navigate"
+                  ? "Leave this exercise?"
+                  : "Complete workout?"
             }
-          />
-        </label>
-      </section>
-      <div className="actions">
-        <button type="button" className="primary" onClick={save}>
-          Save complete result
-        </button>
-        <button type="button" onClick={() => setTimer(60)}>
-          {timer ? `Rest ${timer}s` : "Start rest timer"}
-        </button>
-        <button
-          type="button"
-          onClick={() => setPaused((value) => !value)}
-          disabled={!timer}
-        >
-          {paused ? "Resume timer" : "Pause timer"}
-        </button>
-      </div>
-      <div className="actions">
-        <button
-          type="button"
-          onClick={(event) => requestSelection(selected - 1, event)}
-        >
-          Previous exercise
-        </button>
-        <button
-          type="button"
-          onClick={(event) => requestSelection(selected + 1, event)}
-        >
-          Next exercise
-        </button>
-        <button
-          type="button"
-          className="primary"
-          onClick={(event) => {
-            triggerRef.current = event.currentTarget;
-            setDialog("complete");
-          }}
-        >
-          Complete workout
-        </button>
-        <button
-          type="button"
-          className="danger"
-          onClick={(event) => {
-            triggerRef.current = event.currentTarget;
-            setDialog("cancel");
-          }}
-        >
-          Cancel workout
-        </button>
-      </div>
-      {dialog && (
-        <ConfirmDialog
-          title={
-            dialog === "cancel"
-              ? "Cancel workout?"
-              : dialog === "navigate"
-                ? "Leave this exercise?"
-                : "Complete workout?"
-          }
-          text={
-            dirty
-              ? "You have unsaved changes. Save or discard them before leaving."
-              : "This action cannot be undone."
-          }
-          onCancel={keepEditing}
-          onConfirm={() => {
-            setDialog(null);
-            if (dialog === "navigate") discardAndNavigate();
-            else void finish(dialog === "cancel");
-          }}
-          onSave={
-            dirty && dialog !== "navigate"
-              ? async () => {
-                  if (await save()) {
+            text={
+              dirty
+                ? "You have unsaved changes. Save or discard them before leaving."
+                : "This action cannot be undone."
+            }
+            onCancel={keepEditing}
+            onConfirm={() => {
+              setDialog(null);
+              if (dialog === "navigate") discardAndNavigate();
+              else void finish(dialog === "cancel");
+            }}
+            onSave={
+              dirty && dialog !== "navigate"
+                ? async () => {
+                    if (await save()) {
+                      setDialog(null);
+                      void finish(dialog === "cancel");
+                    }
+                  }
+                : dialog === "navigate"
+                  ? saveAndNavigate
+                  : undefined
+            }
+            onDiscard={
+              dirty && dialog !== "navigate"
+                ? () => {
+                    setDirty(false);
                     setDialog(null);
                     void finish(dialog === "cancel");
                   }
-                }
-              : dialog === "navigate"
-                ? saveAndNavigate
-                : undefined
-          }
-          onDiscard={
-            dirty && dialog !== "navigate"
-              ? () => {
-                  setDirty(false);
-                  setDialog(null);
-                  void finish(dialog === "cancel");
-                }
-              : dialog === "navigate"
-                ? discardAndNavigate
-                : undefined
-          }
-          restoreFocus={triggerRef.current}
-        />
-      )}
+                : dialog === "navigate"
+                  ? discardAndNavigate
+                  : undefined
+            }
+            restoreFocus={triggerRef.current}
+          />
+        )}
+      </section>
     </Load>
   );
 }
@@ -2009,28 +2285,45 @@ function Measurements() {
   }, []);
   return (
     <Load>
-      <div className="title-row">
-        <h1>Measurements</h1>
-        <Link className="button primary" to="new">
-          Add
-        </Link>
-      </div>
-      {data === null ? (
-        <p>Loading…</p>
-      ) : data.length === 0 ? (
-        <p className="empty">No measurements yet.</p>
-      ) : (
-        <div className="stack">
-          {data.map((m) => (
-            <Card
-              key={m.id}
-              to={`/measurements/${m.id}`}
-              title={new Date(m.measuredAt).toLocaleDateString()}
-              text={Object.keys(m.metrics).join(" · ")}
-            />
-          ))}
-        </div>
-      )}
+      <section className="catalog-page">
+        <header className="catalog-header">
+          <div>
+            <p className="eyebrow">EVOLUTION</p>
+            <h1>Measurements</h1>
+          </div>
+          <Link className="button primary catalog-cta" to="new">
+            Add
+          </Link>
+        </header>
+        {data === null ? (
+          <p>Loading…</p>
+        ) : data.length === 0 ? (
+          <p className="empty">No measurements yet.</p>
+        ) : (
+          <div className="catalog-grid">
+            {data.map((m) => (
+              <Link
+                className="catalog-card measurement-card"
+                key={m.id}
+                to={`/measurements/${m.id}`}
+              >
+                <span className="catalog-number" aria-hidden="true">
+                  {String(m.id).padStart(2, "0")}
+                </span>
+                <div>
+                  <h2>{new Date(m.measuredAt).toLocaleDateString()}</h2>
+                  <div className="catalog-meta">
+                    {Object.keys(m.metrics).map((metric) => (
+                      <span key={metric}>{metric}</span>
+                    ))}
+                  </div>
+                </div>
+                <p>{m.notes || "Open this body metric snapshot."}</p>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
     </Load>
   );
 }
@@ -2046,15 +2339,35 @@ function MeasurementDetail() {
   return (
     <Load>
       {m ? (
-        <>
-          <h1>Measurement</h1>
-          <p>{new Date(m.measuredAt).toLocaleString()}</p>
-          {Object.entries(m.metrics).map(([k, v]) => (
-            <p key={k}>
-              <strong>{k}</strong>: {v.value} {v.unit}
-            </p>
-          ))}
-        </>
+        <section className="detail-page">
+          <Link className="back-link" to="/measurements">
+            ← Measurements
+          </Link>
+          <header className="detail-header">
+            <div>
+              <p className="eyebrow">BODY METRICS</p>
+              <h1>Measurement</h1>
+            </div>
+            <div className="version-badge">
+              <span>DATE</span>
+              <strong>{new Date(m.measuredAt).toLocaleDateString()}</strong>
+            </div>
+          </header>
+          <p className="detail-copy">
+            {new Date(m.measuredAt).toLocaleString()}
+          </p>
+          <div className="metric-grid">
+            {Object.entries(m.metrics).map(([k, v]) => (
+              <section className="metric-card" key={k}>
+                <span>{k}</span>
+                <strong>
+                  {v.value} {v.unit}
+                </strong>
+              </section>
+            ))}
+          </div>
+          {m.notes && <p className="detail-copy">{m.notes}</p>}
+        </section>
       ) : (
         <p>Measurement not found.</p>
       )}
@@ -2072,28 +2385,38 @@ function Account() {
   }, []);
   return (
     <Load>
-      <h1>Account</h1>
-      <section className="card">
-        <p>
-          <span className="eyebrow">ID</span> {me?.id}
-        </p>
-        {me?.displayName && (
+      <section className="detail-page account-page">
+        <header className="detail-header">
+          <div>
+            <p className="eyebrow">PROFILE</p>
+            <h1>Account</h1>
+          </div>
+          <div className="account-avatar" aria-hidden="true">
+            {me?.displayName?.slice(0, 1).toUpperCase() || "W"}
+          </div>
+        </header>
+        <section className="info-card account-card">
           <p>
-            <span className="eyebrow">DISPLAY NAME</span> {me.displayName}
+            <span className="eyebrow">ID</span> {me?.id}
           </p>
-        )}
+          {me?.displayName && (
+            <p>
+              <span className="eyebrow">DISPLAY NAME</span> {me.displayName}
+            </p>
+          )}
+        </section>
+        <button
+          type="button"
+          className="danger account-signout"
+          onClick={async () => {
+            await supabase().auth.signOut();
+            sessionStorage.removeItem("returnTo");
+            nav("/login", { replace: true });
+          }}
+        >
+          Sign out
+        </button>
       </section>
-      <button
-        type="button"
-        className="danger"
-        onClick={async () => {
-          await supabase().auth.signOut();
-          sessionStorage.removeItem("returnTo");
-          nav("/login", { replace: true });
-        }}
-      >
-        Sign out
-      </button>
     </Load>
   );
 }
@@ -2132,7 +2455,11 @@ const router = createBrowserRouter([
         path: "*",
         element: (
           <Load>
-            <h1>Not found</h1>
+            <section className="state-page">
+              <p className="eyebrow">404</p>
+              <h1>Not found</h1>
+              <p>The requested page does not exist.</p>
+            </section>
           </Load>
         ),
       },

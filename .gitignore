@@ -1,4 +1,6 @@
-.env
+.env*
+!.env.example
+!**/.env.example
 .opencode/
 node_modules/
 dist/

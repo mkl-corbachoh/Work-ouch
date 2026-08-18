@@ -58,6 +58,29 @@ describe("authentication API", () => {
     });
   });
 
+  it("does not log verifier diagnostics from rejected bearer tokens", async () => {
+    const { logger, records } = createCapturedLogger();
+    const rejectingProvider: AuthProvider = {
+      async verify() {
+        throw new Error("sensitive-verifier-detail");
+      },
+    };
+    const rejectingApp = createApp({
+      database: temporary.database,
+      logger,
+      authProvider: rejectingProvider,
+    });
+
+    const response = await request(rejectingApp)
+      .get("/api/v1/me")
+      .set("Authorization", "Bearer sensitive-bearer-value");
+
+    expect(response.status).toBe(401);
+    const logs = JSON.stringify(records);
+    expect(logs).not.toContain("sensitive-verifier-detail");
+    expect(logs).not.toContain("sensitive-bearer-value");
+  });
+
   it("bootstraps idempotently and resolves the current user", async () => {
     const first = await request(app)
       .post("/api/v1/auth/bootstrap")

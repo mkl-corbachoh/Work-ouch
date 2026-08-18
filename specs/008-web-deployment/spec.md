@@ -1,8 +1,12 @@
 ---
-status: draft
+status: approved
 ---
 
 # 008 - Despliegue web y entorno de autenticación externa
+
+Implementación aprobada por el usuario el 2026-08-17. El despliegue público y el
+smoke OAuth real permanecen bloqueados hasta completar los gates operativos de
+esta spec.
 
 ## Objetivo
 
@@ -67,7 +71,8 @@ Training API --------------> volumen SQLite privado en /app/data
   hostname canónico sin esquema. Ambas variables son obligatorias en producción.
 - Traefik usa el entrypoint `websecure`, TLS y el certificate resolver
   `letsencrypt`. El router de API combina una regla `Host` para `APP_DOMAIN` con
-  `PathPrefix` para `/api/v1`; el router web usa el mismo host con menor
+  `Path` exacto para `/api/v1` o `PathPrefix` para `/api/v1/`; así no captura
+  prefijos distintos como `/api/v10`. El router web usa el mismo host con menor
   prioridad. No se aplica `StripPrefix` ni middleware que transforme o registre
   el bearer.
 - `/health` tiene un router público independiente limitado al mismo host y a la
@@ -209,17 +214,22 @@ Quedan fijadas estas decisiones:
    releases quedan fuera de esta spec.
 6. Los servicios y puertos son `api:3000`, Nginx `web:80` y Vite `web:5173`; las
    publicaciones locales predeterminadas son 3000 y 5173 sobre loopback.
+7. El proveedor inicial es Google y no se solicitan scopes adicionales:
+   `VITE_AUTH_PROVIDERS=google` y `VITE_AUTH_SCOPES_JSON={}`.
+8. Compose recibe la configuración desde un `.env` no versionado; el repositorio
+   solo contiene `.env.example` sin valores efectivos ni secretos.
+9. Se usará una cuenta de smoke dedicada, que se registrará antes del despliegue
+   público y no bloquea la implementación local.
 
-La spec no puede aprobarse hasta decidir y registrar todavía:
+Antes del despliegue público se deben registrar y verificar:
 
 1. Valor efectivo de `APP_DOMAIN`, DNS y nombre efectivo de
    `TRAEFIK_NETWORK` en el servidor.
-2. Proveedores OAuth habilitados y scopes por proveedor.
-3. Valores efectivos de issuer, JWKS URL y audience, y confirmación de emisión
+2. Valores efectivos de issuer, JWKS URL y audience, y confirmación de emisión
    RS256 por el proyecto Supabase compartido.
-4. Mecanismo de inyección de configuración pública y server-only, redacción de
-   logs de Traefik/Nginx/API y almacenamiento de evidencias.
-5. Cuenta de smoke, datos mínimos, responsable, frecuencia y revocación de sus
+3. Configuración efectiva de redacción de logs de Traefik/Nginx/API y
+   almacenamiento de evidencias.
+4. Cuenta de smoke dedicada, datos mínimos, responsable, frecuencia y revocación de sus
    sesiones.
 
 ## Riesgos y compatibilidad

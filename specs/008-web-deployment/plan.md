@@ -2,8 +2,8 @@
 
 ## Precondiciones
 
-Esta spec permanece en `draft`: no se implementa ni despliega hasta que el
-operador resuelva las decisiones restantes de `spec.md`. Se parte de la API
+La implementación está aprobada. El despliegue público permanece bloqueado hasta
+que el operador complete los gates efectivos de `spec.md`. Se parte de la API
 protegida de la spec 006, del SPA compilable de la spec 007 y del Compose de API
 creado por la spec 001. Producción se ejecutará mediante Docker Compose en un
 único servidor y se integrará con el Traefik que ya opera otras aplicaciones.
@@ -44,7 +44,9 @@ Supabase seguirá siendo externo.
 
 Los Compose usarán servicios estables llamados `api` y `web`. Producción ejecuta
 API en el puerto interno 3000 y Nginx en el 80; desarrollo ejecuta API en el 3000
-y Vite en el 5173. Supabase no forma parte de ningún Compose.
+y Vite en el 5173. Supabase no forma parte de ningún Compose. Un `.env` local no
+versionado alimenta Compose y `.env.example` documenta únicamente nombres y
+valores de muestra. El proveedor inicial es Google sin scopes adicionales.
 
 ## Construcción, despliegue y rollback
 

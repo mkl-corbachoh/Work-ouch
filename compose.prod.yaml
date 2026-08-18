@@ -1,0 +1,43 @@
+services:
+  api:
+    restart: unless-stopped
+    networks:
+      - default
+      - traefik
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: ${TRAEFIK_NETWORK:?TRAEFIK_NETWORK is required}
+      traefik.http.routers.work-ouch-api.rule: Host(`${APP_DOMAIN:?APP_DOMAIN is required}`) && (Path(`/api/v1`) || PathPrefix(`/api/v1/`))
+      traefik.http.routers.work-ouch-api.entrypoints: websecure
+      traefik.http.routers.work-ouch-api.priority: "100"
+      traefik.http.routers.work-ouch-api.tls: "true"
+      traefik.http.routers.work-ouch-api.tls.certresolver: letsencrypt
+      traefik.http.routers.work-ouch-api.service: work-ouch-api
+      traefik.http.services.work-ouch-api.loadbalancer.server.port: "3000"
+      traefik.http.routers.work-ouch-health.rule: Host(`${APP_DOMAIN:?APP_DOMAIN is required}`) && Path(`/health`)
+      traefik.http.routers.work-ouch-health.entrypoints: websecure
+      traefik.http.routers.work-ouch-health.priority: "110"
+      traefik.http.routers.work-ouch-health.tls: "true"
+      traefik.http.routers.work-ouch-health.tls.certresolver: letsencrypt
+      traefik.http.routers.work-ouch-health.service: work-ouch-api
+
+  web:
+    restart: unless-stopped
+    networks:
+      - default
+      - traefik
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: ${TRAEFIK_NETWORK:?TRAEFIK_NETWORK is required}
+      traefik.http.routers.work-ouch-web.rule: Host(`${APP_DOMAIN:?APP_DOMAIN is required}`)
+      traefik.http.routers.work-ouch-web.entrypoints: websecure
+      traefik.http.routers.work-ouch-web.priority: "1"
+      traefik.http.routers.work-ouch-web.tls: "true"
+      traefik.http.routers.work-ouch-web.tls.certresolver: letsencrypt
+      traefik.http.routers.work-ouch-web.service: work-ouch-web
+      traefik.http.services.work-ouch-web.loadbalancer.server.port: "80"
+
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK:?TRAEFIK_NETWORK is required}

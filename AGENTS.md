@@ -12,7 +12,7 @@
 ## Current Bootstrap State
 
 - The Node.js project, npm lockfile, Justfile, application foundation, migration runner, and executable checks now exist; use the documented `just` recipes.
-- Specs 001-007 are completed, including user-confirmed Docker verification for spec 001. Spec 006 protects the API with configured external JWT authentication and spec 007 provides the web client. Spec 008 (`web-deployment`) remains draft for production hosting and external-auth environment work; MCP remains reserved for spec 009.
+- Specs 001-007 are completed, including user-confirmed Docker verification for spec 001. Spec 006 protects the API with configured external JWT authentication and spec 007 provides the web client. Spec 008 (`web-deployment`) is approved and its local Compose/Nginx implementation is verified; production Traefik/TLS, effective Supabase JWT settings, real OAuth smoke, and rollback rehearsal remain pending. MCP remains reserved for spec 009.
 - User endpoints have no owning spec yet. Do not place them into `001-project-foundation` or another spec without resolving the open decision in `docs/architecture.md`.
 - Spec 001 fixes Node.js 24 LTS, npm, and Biome. Initial pagination remains undecided and outside spec 001.
 

@@ -37,16 +37,49 @@ db-import:
     npm run db:import
 
 docker-build:
-    docker compose build
+    docker compose -p work-ouch-dev -f compose.yaml -f compose.dev.yaml build
 
 docker-up:
-    docker compose up -d --build
+    docker compose -p work-ouch-dev -f compose.yaml -f compose.dev.yaml up -d --build
 
 docker-down:
-    docker compose down
+    docker compose -p work-ouch-dev -f compose.yaml -f compose.dev.yaml down
 
 docker-logs:
-    docker compose logs -f api
+    docker compose -p work-ouch-dev -f compose.yaml -f compose.dev.yaml logs -f api web
+
+docker-dev-config:
+    docker compose -p work-ouch-dev -f compose.yaml -f compose.dev.yaml config --quiet
+
+docker-dev-build:
+    docker compose -p work-ouch-dev -f compose.yaml -f compose.dev.yaml build
+
+docker-dev-up:
+    docker compose -p work-ouch-dev -f compose.yaml -f compose.dev.yaml up -d --build
+
+docker-dev-down:
+    docker compose -p work-ouch-dev -f compose.yaml -f compose.dev.yaml down
+
+docker-dev-logs:
+    docker compose -p work-ouch-dev -f compose.yaml -f compose.dev.yaml logs -f api web
+
+docker-prod-config:
+    docker compose -p work-ouch -f compose.yaml -f compose.prod.yaml config --quiet
+
+docker-prod-build:
+    docker compose -p work-ouch -f compose.yaml -f compose.prod.yaml build
+
+docker-prod-up:
+    docker compose -p work-ouch -f compose.yaml -f compose.prod.yaml up -d --build
+
+docker-prod-down:
+    docker compose -p work-ouch -f compose.yaml -f compose.prod.yaml down
+
+docker-prod-logs:
+    docker compose -p work-ouch -f compose.yaml -f compose.prod.yaml logs -f api web
+
+docker-prod-nginx-check:
+    docker compose -p work-ouch -f compose.yaml -f compose.prod.yaml run --rm --no-deps web nginx -t
 
 web-install:
     npm --prefix web ci

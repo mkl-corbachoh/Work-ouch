@@ -14,6 +14,7 @@ describe("HTTP logging", () => {
 
     await request(app)
       .get("/logged?secret=query-value")
+      .set("Authorization", "Bearer authorization-value")
       .send({ secret: "body-value" });
 
     expect(records).toHaveLength(1);
@@ -26,6 +27,7 @@ describe("HTTP logging", () => {
     expect(records[0]?.durationMs).toEqual(expect.any(Number));
     expect(JSON.stringify(records[0])).not.toContain("query-value");
     expect(JSON.stringify(records[0])).not.toContain("body-value");
+    expect(JSON.stringify(records[0])).not.toContain("authorization-value");
   });
 
   it("records unexpected error diagnostics without exposing them in the response", async () => {

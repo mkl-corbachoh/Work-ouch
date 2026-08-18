@@ -21,6 +21,9 @@ Las variables soportadas se documentan en `.env.example`:
 | `DATABASE_PATH` | `./data/training.db` | Ruta no vacia |
 | `PORT` | `3000` | Entero entre 1 y 65535 |
 | `NODE_ENV` | `development` | `development`, `test` o `production` |
+| `AUTH_ISSUER` | Sin default | Issuer JWT de Supabase Auth |
+| `AUTH_AUDIENCE` | Sin default | Audience exigida por la API |
+| `AUTH_JWKS_URL` | Sin default | JWKS público de Supabase Auth |
 
 `Justfile` carga un archivo `.env` si existe. Para empezar:
 
@@ -239,19 +242,29 @@ destruye la base y sus sidecars** y se rechaza con `NODE_ENV=production`.
 
 ## Docker
 
+El flujo Docker de desarrollo ejecuta API y SPA con hot reload sin exigir
+Node.js, npm o SQLite en el host:
+
 ```sh
-just docker-build
-just docker-up
-curl http://localhost:3000/health
-just docker-logs
-just docker-down
+just docker-dev-config
+just docker-dev-up
+curl http://localhost:5173/health
+just docker-dev-logs
+just docker-dev-down
 ```
 
-Compose ejecuta el JavaScript compilado como usuario no root. La base se guarda
-en `/app/data/training.db` dentro del volumen nombrado `training_data`.
-`just docker-down` conserva ese volumen; para eliminar tambien los datos debe
-usarse de forma deliberada `docker compose down --volumes`.
-# Cliente web
+Los comandos históricos `docker-build`, `docker-up`, `docker-logs` y
+`docker-down` son alias del entorno de desarrollo. Los puertos predeterminados
+son 5173 para Vite y 3000 para inspección directa de la API, ambos limitados a
+loopback. La base usa un volumen exclusivo de desarrollo.
+
+Producción usa `compose.yaml` y `compose.prod.yaml`, construye API y Nginx en el
+servidor y se conecta al Traefik existente mediante `APP_DOMAIN` y
+`TRAEFIK_NETWORK`. No publica directamente los puertos 80 ni 3000. Consulta el
+[runbook de despliegue](docs/deployment.md) para configuración, Supabase, smoke y
+rollback.
+
+## Cliente web
 
 El SPA vive en `web/` y se ejecuta con React 19, Vite y TypeScript estricto.
 Instala y verifica con `just web-install`, `just web-dev`, `just web-test`,
@@ -265,4 +278,5 @@ de API en el navegador.
 
 En producción, sirve el build estático y la Training API bajo el mismo origen:
 `/` debe tener fallback a `index.html` y `/api/v1/*` debe reenviar a la API. Esta
-topología evita requerir CORS y no modifica el backend.
+topología evita requerir CORS y no modifica el backend. Nginx sirve el SPA y
+Traefik enruta `/api/v1` y el `/health` público.

@@ -3,14 +3,36 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: runtime
     environment:
       NODE_ENV: production
       PORT: 3000
       DATABASE_PATH: /app/data/training.db
-    ports:
-      - "3000:3000"
+      AUTH_ISSUER: ${AUTH_ISSUER:?AUTH_ISSUER is required}
+      AUTH_AUDIENCE: ${AUTH_AUDIENCE:?AUTH_AUDIENCE is required}
+      AUTH_JWKS_URL: ${AUTH_JWKS_URL:?AUTH_JWKS_URL is required}
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - fetch('http://127.0.0.1:3000/health').then((response) => { if (!response.ok) process.exit(1); }).catch(() => process.exit(1))
+      interval: 5s
+      timeout: 3s
+      start_period: 5s
+      retries: 5
     volumes:
       - training_data:/app/data
 
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+      target: production
+      args:
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL:?VITE_SUPABASE_URL is required}
+        VITE_SUPABASE_PUBLISHABLE_KEY: ${VITE_SUPABASE_PUBLISHABLE_KEY:?VITE_SUPABASE_PUBLISHABLE_KEY is required}
+        VITE_AUTH_PROVIDERS: ${VITE_AUTH_PROVIDERS:-google}
+        VITE_AUTH_SCOPES_JSON: ${VITE_AUTH_SCOPES_JSON:-{}}
 volumes:
   training_data:

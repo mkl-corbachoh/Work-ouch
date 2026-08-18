@@ -211,6 +211,19 @@ base local por defecto en `./data/training.db`.
 El logging HTTP sera estructurado e incluira metodo, ruta, estado, duracion y
 errores, sin registrar cuerpos completos por defecto.
 
+Produccion se ejecuta mediante Docker Compose en un unico servidor. Los
+contenedores `api` y `web` se construyen en el servidor y se conectan a la red
+externa indicada por `TRAEFIK_NETWORK`; no publican puertos del host. El Traefik
+existente termina TLS con el resolver `letsencrypt`, enruta `/api/v1` y el
+`/health` publico directamente a la API, y envia el resto a Nginx. Nginx sirve
+`web/dist`, aplica fallback SPA solo a GET/HEAD y diferencia cache de HTML y
+assets con hash. SQLite conserva el volumen `/app/data`.
+
+El Compose de desarrollo ejecuta API y Vite con hot reload en los puertos de
+loopback configurables 3000 y 5173. Las dependencias y SQLite viven en volumenes
+Docker separados de produccion, por lo que Linux y Windows 11 con Docker
+Desktop/WSL2 no necesitan Node.js ni SQLite instalados en el host.
+
 ## Cliente web
 
 La spec `007-web-client` reserva el numero 007 para el SPA mobile-first bajo

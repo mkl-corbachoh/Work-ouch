@@ -1,6 +1,7 @@
 .git
 .gitignore
-.env
+.env*
+.github
 .opencode
 bin
 coverage
@@ -9,4 +10,5 @@ dist
 node_modules
 specs
 tests
+web
 *.log

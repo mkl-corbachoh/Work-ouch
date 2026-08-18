@@ -1,0 +1,37 @@
+services:
+  api:
+    build:
+      target: development
+    environment:
+      NODE_ENV: development
+    ports:
+      - "127.0.0.1:${API_DEV_PORT:-3000}:3000"
+    volumes:
+      - .:/app
+      - api_node_modules:/app/node_modules
+      - training_dev_data:/app/data
+
+  web:
+    build:
+      target: development
+    environment:
+      WEB_API_PROXY_TARGET: http://api:3000
+      WEB_DEV_HOST: 0.0.0.0
+      WEB_USE_POLLING: "true"
+      VITE_SUPABASE_URL: ${VITE_SUPABASE_URL:?VITE_SUPABASE_URL is required}
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${VITE_SUPABASE_PUBLISHABLE_KEY:?VITE_SUPABASE_PUBLISHABLE_KEY is required}
+      VITE_AUTH_PROVIDERS: ${VITE_AUTH_PROVIDERS:-google}
+      VITE_AUTH_SCOPES_JSON: ${VITE_AUTH_SCOPES_JSON:-{}}
+    ports:
+      - "127.0.0.1:${WEB_DEV_PORT:-5173}:5173"
+    volumes:
+      - ./web:/app
+      - web_node_modules:/app/node_modules
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  api_node_modules:
+  training_dev_data:
+  web_node_modules:

@@ -2,6 +2,7 @@ import type { RequestHandler } from "express";
 import { HttpError } from "../../shared/http-errors";
 import type { AuthProvider } from "./auth.provider";
 import type { AuthRepository } from "./auth.repository";
+import type { ExternalIdentity } from "./auth.types";
 
 export function requireAuth(
   provider: AuthProvider,
@@ -20,33 +21,34 @@ export function requireAuth(
       );
       return;
     }
+    let identity: ExternalIdentity;
     try {
-      const identity = await provider.verify(token);
-      const user = repository.findByIdentity(identity);
-      if (!user) {
-        next(
-          new HttpError(
-            401,
-            "AUTHENTICATION_REQUIRED",
-            "Authentication required",
-          ),
-        );
-        return;
-      }
-      request.externalIdentity = identity;
-      request.currentUser = user;
-      next();
-    } catch (error) {
+      identity = await provider.verify(token);
+    } catch {
       next(
         new HttpError(
           401,
           "AUTHENTICATION_REQUIRED",
           "Authentication required",
-          null,
-          error,
         ),
       );
+      return;
     }
+
+    const user = repository.findByIdentity(identity);
+    if (!user) {
+      next(
+        new HttpError(
+          401,
+          "AUTHENTICATION_REQUIRED",
+          "Authentication required",
+        ),
+      );
+      return;
+    }
+    request.externalIdentity = identity;
+    request.currentUser = user;
+    next();
   };
 }
 
@@ -64,14 +66,12 @@ export function requireExternalAuth(provider: AuthProvider): RequestHandler {
     try {
       request.externalIdentity = await provider.verify(token);
       next();
-    } catch (error) {
+    } catch {
       next(
         new HttpError(
           401,
           "AUTHENTICATION_REQUIRED",
           "Authentication required",
-          null,
-          error,
         ),
       );
     }
